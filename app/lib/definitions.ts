@@ -75,6 +75,7 @@ export interface ModalProps {
   centerContent?: boolean,
   classNames?: {
     base?: string | undefined,
+    header?: string | undefined,
     backdrop?: string | undefined,
     body?: string | undefined,
     footer?: string | undefined,

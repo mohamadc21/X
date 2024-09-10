@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppSelector } from "@/app/lib/hooks";
-import { modalProps } from "@/app/lib/utils";
+import { useModalProps } from "@/app/lib/utils";
 import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/modal";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState, useTransition } from "react";
@@ -16,6 +16,7 @@ function LoginFlow() {
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
   const currentStep = useAppSelector(state => state.user.login.step);
+  const modalProps = useModalProps;
 
   function onTransition(callback: Function) {
     startTransition(async () => await callback());

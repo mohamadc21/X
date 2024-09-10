@@ -4,7 +4,7 @@ import { addTwitt, triggerTwitts } from "@/app/lib/actions";
 import { AddTwitt, SessionUser } from "@/app/lib/definitions";
 import LoadingSpinner from "@/app/ui/LoadingSpinner";
 import { GiphyFetch, ICategory } from "@giphy/js-fetch-api";
-import { Button, Input, Modal, ModalBody, ModalContent, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
+import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
 import Image from "next/image";
 import React, { ChangeEvent, EventHandler, MouseEventHandler, useEffect, useRef, useState, useTransition } from "react";
 import { BsEmojiSmile } from "react-icons/bs";
@@ -13,7 +13,7 @@ import { IoClose, IoLocationOutline } from "react-icons/io5";
 import { LuImage } from "react-icons/lu";
 import { MdGif } from "react-icons/md";
 import { RiCalendarScheduleLine } from "react-icons/ri";
-import { modalProps } from "../lib/utils";
+import { useModalProps } from "../lib/utils";
 import EmojiPicker, { EmojiClickData, EmojiStyle, SkinTonePickerLocation, Theme } from 'emoji-picker-react';
 
 const options = [
@@ -43,7 +43,7 @@ const options = [
   // },
 ]
 
-function CreatePost({ user }: { user: SessionUser }) {
+function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: boolean }) {
   const [mounted, setMounted] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [text, setText] = useState('');
@@ -59,6 +59,7 @@ function CreatePost({ user }: { user: SessionUser }) {
   const gf = new GiphyFetch('ywdLkUP7O8eyz3Q3cndJ1oTmQyOIg15U')
   const { isOpen, onOpenChange, onOpen, onClose } = useDisclosure();
   const [isOpenEmojiPanel, setIsOpenEmojiPanel] = useState(false);
+  const modalProps = useModalProps;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -166,53 +167,76 @@ function CreatePost({ user }: { user: SessionUser }) {
   }, [image.temp]);
 
   return (
-    <div className="px-4">
-      <div className="flex gap-1">
-        <Image
-          width={44}
-          height={44}
-          priority={true}
-          src={user?.image || '/default_white.jpg'}
-          alt={user.name!}
-          className="flex-shrink-0 w-11 h-11 rounded-full"
-        />
-        <div className="w-full relative">
-          <div className="relative">
-            <Textarea
-              variant="bordered"
-              size="lg"
-              placeholder="What&apos;s happening?!"
-              classNames={{
-                input: "text-xl max-[380px]:text-lg",
-                inputWrapper: "border-none",
-              }}
-              value={text}
-              onChange={(e) => {
-                setText(e.target.value);
-                setFullText(e.target.value);
-              }}
-              minRows={2}
-              maxRows={50}
-            />
-          </div>
-          {image.temp && (
-            <div className="relative">
-              <img className="w-full h-full rounded-2xl" src={image.temp} />
-              <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setImage({ upload: null, temp: null })}>
-                <IoClose size="20" />
-              </Button>
-              <Button variant="faded" onClick={() => handleOptionClick('uploadImage')} size="sm" className=" absolute top-2 left-2 text-base" radius="full">Edit</Button>
+    <>
+      {asModal ? (
+        <>
+          <ModalBody>
+            <div className="flex gap-1">
+              <Image
+                width={44}
+                height={44}
+                priority={true}
+                src={user?.image || '/default_white.jpg'}
+                alt={user.name!}
+                className="flex-shrink-0 w-11 h-11 rounded-full"
+              />
+              <div className="w-full relative">
+                <div className="relative">
+                  <Textarea
+                    variant="bordered"
+                    size="lg"
+                    placeholder="What&apos;s happening?!"
+                    classNames={{
+                      input: "text-xl max-[380px]:text-lg",
+                      inputWrapper: "border-none",
+                    }}
+                    value={text}
+                    onChange={(e) => {
+                      setText(e.target.value);
+                      setFullText(e.target.value);
+                    }}
+                    minRows={2}
+                    maxRows={12}
+                  />
+                </div>
+                {image.temp && (
+                  <div className="relative">
+                    <img className="w-full h-full rounded-2xl" src={image.temp} />
+                    <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setImage({ upload: null, temp: null })}>
+                      <IoClose size="20" />
+                    </Button>
+                    <Button variant="faded" onClick={() => handleOptionClick('uploadImage')} size="sm" className=" absolute top-2 left-2 text-base" radius="full">Edit</Button>
+                  </div>
+                )}
+                {gif && (
+                  <div className="relative">
+                    <img className="w-full h-full rounded-2xl" src={gif} />
+                    <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setGif('')}>
+                      <IoClose size="20" />
+                    </Button>
+                  </div>
+                )}
+                {mounted && (
+                  <div className="absolute top-full z-50" ref={emojiPickerRef}>
+                    <EmojiPicker
+                      autoFocusSearch={true}
+                      open={isOpenEmojiPanel}
+                      theme={Theme.DARK}
+                      emojiStyle={EmojiStyle.TWITTER}
+                      width={350}
+                      height={400}
+                      className="!bg-background z-30"
+                      skinTonePickerLocation={SkinTonePickerLocation.PREVIEW}
+                      onEmojiClick={handleEmojiSelect}
+                      style={{ "--epr-emoji-size": "20px", "--epr-bg-color": "bg-background", "--epr-category-label-bg-color": "bg-background" } as React.CSSProperties}
+                    />
+                  </div>
+
+                )}
+              </div>
             </div>
-          )}
-          {gif && (
-            <div className="relative">
-              <img className="w-full h-full rounded-2xl" src={gif} />
-              <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setGif('')}>
-                <IoClose size="20" />
-              </Button>
-            </div>
-          )}
-          <div className="flex items-center justify-between py-3 sticky bottom-0 left-0 w-full gap-3">
+          </ModalBody>
+          <ModalFooter className="flex items-center justify-between py-3 sticky bottom-0 left-0 w-full gap-3">
             <div className="flex max-[400px]:-ml-12 items-center gap-0.5">
               {options.map((opt, idx) => (
                 <Button onClick={() => handleOptionClick(opt.type)} key={idx} isIconOnly size="sm" variant="light" radius="full" color="primary" isDisabled={!opt.type}>
@@ -229,40 +253,110 @@ function CreatePost({ user }: { user: SessionUser }) {
             </div>
             <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">Post</Button>
 
-          </div>
-          {mounted && (
-            <div className="absolute top-full" ref={emojiPickerRef}>
-              <EmojiPicker
-                autoFocusSearch={true}
-                open={isOpenEmojiPanel}
-                theme={Theme.DARK}
-                emojiStyle={EmojiStyle.TWITTER}
-                width={350}
-                height={400}
-                className="!bg-background z-30"
-                skinTonePickerLocation={SkinTonePickerLocation.PREVIEW}
-                onEmojiClick={handleEmojiSelect}
-                style={{ "--epr-emoji-size": "20px", "--epr-bg-color": "bg-background", "--epr-category-label-bg-color": "bg-background" } as React.CSSProperties}
-              />
-            </div>
+          </ModalFooter>
+        </>
+      ) : (
+        <div className="px-4">
+          <div className="flex gap-1">
+            <Image
+              width={44}
+              height={44}
+              priority={true}
+              src={user?.image || '/default_white.jpg'}
+              alt={user.name!}
+              className="flex-shrink-0 w-11 h-11 rounded-full"
+            />
+            <div className="w-full relative">
+              <div className="relative">
+                <Textarea
+                  variant="bordered"
+                  size="lg"
+                  placeholder="What&apos;s happening?!"
+                  classNames={{
+                    input: "text-xl max-[380px]:text-lg",
+                    inputWrapper: "border-none",
+                  }}
+                  value={text}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                    setFullText(e.target.value);
+                  }}
+                  minRows={2}
+                  maxRows={50}
+                />
+              </div>
+              {image.temp && (
+                <div className="relative">
+                  <img className="w-full h-full rounded-2xl" src={image.temp} />
+                  <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setImage({ upload: null, temp: null })}>
+                    <IoClose size="20" />
+                  </Button>
+                  <Button variant="faded" onClick={() => handleOptionClick('uploadImage')} size="sm" className=" absolute top-2 left-2 text-base" radius="full">Edit</Button>
+                </div>
+              )}
+              {gif && (
+                <div className="relative">
+                  <img className="w-full h-full rounded-2xl" src={gif} />
+                  <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setGif('')}>
+                    <IoClose size="20" />
+                  </Button>
+                </div>
+              )}
 
-          )}
+              <div className="flex items-center justify-between py-3 sticky bottom-0 left-0 w-full gap-3">
+                <div className="flex max-[400px]:-ml-12 items-center gap-0.5">
+                  {options.map((opt, idx) => (
+                    <Button onClick={() => handleOptionClick(opt.type)} key={idx} isIconOnly size="sm" variant="light" radius="full" color="primary" isDisabled={!opt.type}>
+                      {opt.icon}
+                    </Button>
+                  ))}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    hidden
+                  />
+                </div>
+                <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">Post</Button>
+
+              </div>
+              {mounted && (
+                <div className="absolute top-full" ref={emojiPickerRef}>
+                  <EmojiPicker
+                    autoFocusSearch={true}
+                    open={isOpenEmojiPanel}
+                    theme={Theme.DARK}
+                    emojiStyle={EmojiStyle.TWITTER}
+                    width={350}
+                    height={400}
+                    className="!bg-background z-30"
+                    skinTonePickerLocation={SkinTonePickerLocation.PREVIEW}
+                    onEmojiClick={handleEmojiSelect}
+                    style={{ "--epr-emoji-size": "20px", "--epr-bg-color": "bg-background", "--epr-category-label-bg-color": "bg-background" } as React.CSSProperties}
+                  />
+                </div>
+
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        placement="top-center"
+        placement="top"
         {...modalProps({ size: "xl" })}
       >
         <ModalContent>
-          <ModalHeader>
+          <ModalHeader />
+          <ModalBody>
             <form onSubmit={(e) => {
               e.preventDefault();
               if (!search) return;
               fetchGifsBySearch(search);
             }}
-              className="w-[90%]"
+              className="max-w-sm"
             >
               <Input
                 variant="bordered"
@@ -279,8 +373,6 @@ function CreatePost({ user }: { user: SessionUser }) {
                 className="w-full"
               />
             </form>
-          </ModalHeader>
-          <ModalBody>
             <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
               {gifs && (
                 gifs.map(gif => (
@@ -300,7 +392,7 @@ function CreatePost({ user }: { user: SessionUser }) {
           </ModalBody>
         </ModalContent>
       </Modal>
-    </div>
+    </>
   )
 }
 

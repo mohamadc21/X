@@ -1,6 +1,6 @@
 "use client";
 
-import { modalProps } from "@/app/lib/utils";
+import { useModalProps } from "@/app/lib/utils";
 import { Modal, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/modal";
 import { useRouter } from "next/navigation";
 import React, { Dispatch, SetStateAction, useEffect, useState, useTransition } from "react";
@@ -37,6 +37,7 @@ function PasswordResetFlow() {
     error: null,
     step: 1
   });
+  const modalProps = useModalProps;
 
   function onTransition(callback: Function) {
     startTransition(async () => await callback());
