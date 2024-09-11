@@ -3,9 +3,11 @@
 import { Button } from "@nextui-org/button";
 import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/modal";
 import React, { useEffect } from "react";
-import { modalProps } from "./lib/utils";
+import { useModalProps } from "./lib/utils";
 
 function Error({ error, reset }: { error: Error, reset: () => void }) {
+  const modalProps = useModalProps;
+
   useEffect(() => {
     console.error(error);
   }, [error])
