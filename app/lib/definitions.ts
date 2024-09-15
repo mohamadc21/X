@@ -30,6 +30,11 @@ export interface User {
   updated_at: Date
 }
 
+export interface UserViews {
+  id: number,
+  twitt_id: number,
+  user_id: number
+}
 
 export type SessionUser = {
   id?: string
@@ -46,11 +51,16 @@ export interface AddTwitt {
 }
 
 export interface TwittsTable {
-  id: number | string,
+  id: number,
   userId: string | number,
   text: string,
   media: string | null,
-  media_type: 'image' | 'gif' | 'video' | null
+  media_type: 'image' | 'gif' | 'video' | null,
+  likes: (number | string)[],
+  views: (number | string)[],
+  comments: (number | string)[],
+  retwitts: (number | string)[],
+  reply_to: number | null,
   created_at: Date,
   updated_at: Date,
 }

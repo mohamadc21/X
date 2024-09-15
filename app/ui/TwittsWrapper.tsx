@@ -1,29 +1,34 @@
 import React, { Suspense } from "react";
 import { auth } from "../lib/auth";
-import { getAlltwitts } from "../lib/db";
+import { getAlltwitts, getTwittComments } from "../lib/db";
 import TwittsList from "./TwittsList";
 import LoadingSpinner from "./LoadingSpinner";
 import CreatePost from "./CreatePost";
+import { Session } from "next-auth";
+import { ITwitt } from "../lib/definitions";
 
 async function TwittsWrapper() {
+  const session = await auth();
   return (
-    <div className="pt-3 min-h-[98dvh] overflow-hidden w-full">
-      <Suspense fallback={<LoadingSpinner noPadding />}>
-        <Twitts />
+    <div className="sm:pt-3 sm:min-h-[98vh] overflow-hidden w-full sm:mb-0 mb-11 sm:border-x border-default">
+      <div className="sm:block hidden border-b border-default">
+        <CreatePost user={session?.user!} />
+      </div>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Twitts session={session} />
       </Suspense>
     </div>
   )
 }
 
-async function Twitts() {
-  const session = await auth();
+async function Twitts({ session }: { session: Session | null }) {
   const allTwitts = await getAlltwitts();
 
   return (
-    <>
-      <CreatePost user={session?.user!} />
-      <TwittsList session={session!} allTwitts={allTwitts} />
-    </>
+    <TwittsList
+      session={session}
+      allTwitts={allTwitts}
+    />
   )
 }
 

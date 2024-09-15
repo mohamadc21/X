@@ -11,7 +11,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'darkgray': 'rgb(113,118,123)'
+        'darkgray': 'rgb(113,118,123)',
       }
     },
   },

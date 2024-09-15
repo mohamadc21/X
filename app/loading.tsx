@@ -3,9 +3,7 @@ import LoadingSpinner from "@/app/ui/LoadingSpinner";
 
 function Loading() {
   return (
-    <div className="p-5">
-      <LoadingSpinner />
-    </div>
+    <LoadingSpinner type="fullscreen" />
   )
 }
 

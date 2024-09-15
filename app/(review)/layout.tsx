@@ -8,7 +8,7 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex items-center justify-center flex-1">
+    <div className="flex items-center justify-center flex-1 px-4">
       <SignupForm />
       <Suspense fallback={<LoadingSpinner type="fullscreen" />}>
         {children}

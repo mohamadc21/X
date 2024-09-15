@@ -1,7 +1,6 @@
 import React from "react";
 import CreatePost from "@/app/ui/CreatePost";
 import { auth } from "../lib/auth";
-import { ModalBody } from "@nextui-org/modal";
 
 async function CreatePostWrapper() {
   const session = await auth();

@@ -1,29 +1,24 @@
 "use client"
 
 import { Button } from "@nextui-org/button";
-import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/modal";
-import React, { useEffect } from "react";
-import { useModalProps } from "./lib/utils";
+import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/modal";
+import React, { useEffect, useState } from "react";
+import { useModalProps } from "@/app/lib/utils";
+import { IoReload } from "react-icons/io5";
 
-function Error({ error, reset }: { error: Error, reset: () => void }) {
-  const modalProps = useModalProps;
+function Error({ error, reset }: { error: Error & { digest?: string }, reset: () => void }) {
+  const [text, setText] = useState('Something went wrong. try reloading.');
+  const { isOpen, onOpenChange, onOpen } = useDisclosure()
 
   useEffect(() => {
-    console.error(error);
+    onOpen();
+    // setText(error.name);
   }, [error])
-
   return (
-    <Modal {...modalProps}>
-      <ModalContent className="flex items-center justify-center ">
-        <ModalHeader>
-          <h1 className="text-xl">An error occurred</h1>
-        </ModalHeader>
-        <ModalBody>
-          <Button className="w-max font-bold" onClick={reset}>Try again</Button>
-
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+    <div className="flex flex-col items-center justify-center flex-1">
+      <h1 className="mb-4 text-default-400">{text}</h1>
+      <Button color="primary" radius="full" className="w-max gap-1 text-base font-bold" onClick={reset}><IoReload size={20} strokeWidth={20} /><span>Retry</span></Button>
+    </div>
   )
 }
 

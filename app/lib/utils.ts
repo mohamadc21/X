@@ -11,6 +11,8 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
       } else setInMobile(false);
     }
 
+    inMobileCheck();
+
     window.addEventListener('resize', inMobileCheck)
 
     return () => {
@@ -21,8 +23,8 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
   return {
     className: `${props?.className || ''} bg-background  overflow-hidden min-h-[40dvh]`,
     defaultOpen: props?.defaultOpen || true,
+    isDismissable: props?.isDismissable || false,
     classNames: {
-      header: "ml-12",
       backdrop: `${props?.classNames?.backdrop} bg-gray-700/70`,
       body: `${props?.classNames?.body} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'} pb-4 pt-8`,
       footer: `${props?.classNames?.footer} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'}`,

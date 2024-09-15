@@ -302,9 +302,9 @@ export async function changePassword(email: string, password: string): Promise<A
 }
 
 export async function addTwitt({ userId, text, formData, gif }: AddTwitt): Promise<ActionError> {
-  let fields = 'user_id, text';
-  let values = '?,?';
-  let params = [userId, text];
+  let fields = 'user_id, text, comments, likes, retwitts, views';
+  let values = '?,?,?,?,?,?';
+  let params = [userId, text, '[]', '[]', '[]', `[${userId}]`];
 
   if (formData?.get('image')) {
     try {
@@ -328,9 +328,49 @@ export async function addTwitt({ userId, text, formData, gif }: AddTwitt): Promi
 
   try {
     await query(`insert into twitts (${fields}) values (${values})`, params);
+    await triggerTwitts();
   } catch (err) {
     return { message: 'an error occurred' }
   }
+}
+
+export async function increaseTwittView(twitt_id: number | string, user_id: number | string) {
+
+  const result = await query<{ views: number[] }>("select views from twitts where id = ?", [twitt_id]);
+
+  const views = result[0].views;
+
+  const alreadyViewed = views.some(view => view === (typeof user_id === 'string' ? parseInt(user_id) : user_id));
+
+  if (alreadyViewed) return;
+
+  await query("update twitts set views = json_array_append(views, '$', ?) where id = ?", [user_id, twitt_id]);
+  await pusherServer.trigger('twitts', `views`, {
+    id: twitt_id,
+    user_id
+  });
+}
+
+export async function likeTwitt({ twitt_id, user_id }: { twitt_id: number | string, user_id: number | string }) {
+  const result = await query<{ likes: number[] }>("select likes from twitts where id = ? and json_contains(likes, ?)", [twitt_id, `"${user_id}"`]);
+
+  if (!result.length) {
+    await query("update twitts set likes = json_array_append(likes, '$', ?) where id = ?", [user_id, twitt_id])
+    await pusherServer.trigger('twitts', 'likes', {
+      id: twitt_id,
+      user_id,
+      isLiked: true
+    });
+  } else {
+    const likes = result[0].likes.filter(like => like != user_id);
+    await query("update twitts set likes = ? where id = ?", [likes, twitt_id]);
+    await pusherServer.trigger('twitts', 'likes', {
+      id: twitt_id,
+      user_id,
+      isLiked: false
+    });
+  }
+
 }
 
 export async function triggerTwitts() {

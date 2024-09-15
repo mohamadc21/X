@@ -1,20 +1,19 @@
 "use client";
 
-import { addTwitt, triggerTwitts } from "@/app/lib/actions";
+import { addTwitt } from "@/app/lib/actions";
 import { AddTwitt, SessionUser } from "@/app/lib/definitions";
 import LoadingSpinner from "@/app/ui/LoadingSpinner";
 import { GiphyFetch, ICategory } from "@giphy/js-fetch-api";
 import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
+import EmojiPicker, { EmojiClickData, EmojiStyle, SkinTonePickerLocation, Theme } from 'emoji-picker-react';
 import Image from "next/image";
-import React, { ChangeEvent, EventHandler, MouseEventHandler, useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import React, { ChangeEvent, useEffect, useRef, useState, useTransition } from "react";
 import { BsEmojiSmile } from "react-icons/bs";
-import { CgOptions } from "react-icons/cg";
-import { IoClose, IoLocationOutline } from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 import { LuImage } from "react-icons/lu";
 import { MdGif } from "react-icons/md";
-import { RiCalendarScheduleLine } from "react-icons/ri";
 import { useModalProps } from "../lib/utils";
-import EmojiPicker, { EmojiClickData, EmojiStyle, SkinTonePickerLocation, Theme } from 'emoji-picker-react';
 
 const options = [
   {
@@ -60,6 +59,7 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
   const { isOpen, onOpenChange, onOpen, onClose } = useDisclosure();
   const [isOpenEmojiPanel, setIsOpenEmojiPanel] = useState(false);
   const modalProps = useModalProps;
+  const router = useRouter();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -78,12 +78,13 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
       }
       if (gif) twittData.gif = gif;
       await addTwitt(twittData);
-      await triggerTwitts();
-
       setText('');
       setFullText('');
       setGif('');
       setImage({ upload: null, temp: null });
+      if (asModal) {
+        router.back();
+      }
     });
   }
 
@@ -187,7 +188,7 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                     size="lg"
                     placeholder="What&apos;s happening?!"
                     classNames={{
-                      input: "text-xl max-[380px]:text-lg",
+                      input: "text-xl max-[380px]:text-lg placeholder:text-default-400",
                       inputWrapper: "border-none",
                     }}
                     value={text}
@@ -217,7 +218,7 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                   </div>
                 )}
                 {mounted && (
-                  <div className="absolute top-full z-50" ref={emojiPickerRef}>
+                  <div className="fixed z-50" ref={emojiPickerRef}>
                     <EmojiPicker
                       autoFocusSearch={true}
                       open={isOpenEmojiPanel}
@@ -273,7 +274,7 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                   size="lg"
                   placeholder="What&apos;s happening?!"
                   classNames={{
-                    input: "text-xl max-[380px]:text-lg",
+                    input: "text-xl max-[380px]:text-lg placeholder:text-default-400",
                     inputWrapper: "border-none",
                   }}
                   value={text}
@@ -365,7 +366,7 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                 placeholder="Search for gifs"
                 color="primary"
                 classNames={{
-                  label: 'text-darkgray text-lg'
+                  label: 'text-default-400 text-lg'
                 }}
                 onChange={(e) => setSearch(e.target.value)}
                 value={search}

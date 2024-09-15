@@ -13,7 +13,7 @@ async function Page() {
   if (!session) redirect('/i/flow/login');
 
   return (
-    <div className="flex-1 lg:max-w-full">
+    <div className="flex-1 lg:max-w-full max-w-[600px]">
       <TwittsWrapper />
     </div>
   )
