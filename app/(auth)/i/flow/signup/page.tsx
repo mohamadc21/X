@@ -1,5 +1,5 @@
 import React from "react";
-import CredentialsFlow from "@/app/ui/auth/signup/credentials/CredentailsFlow";
+import CredentialsFlow from "@/app/home/(auth)/i/flow/signup/credentials/CredentailsFlow";
 import { Metadata } from "next";
 import { auth } from "@/app/lib/auth";
 import { redirect } from "next/navigation";

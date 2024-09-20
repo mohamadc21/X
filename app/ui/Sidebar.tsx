@@ -10,7 +10,7 @@ async function Sidebar() {
   return (
     <>
       <Navigation session={session!} />
-      <BottomNavigation />
+      <BottomNavigation session={session!} />
     </>
   )
 }

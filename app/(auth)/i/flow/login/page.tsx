@@ -1,5 +1,5 @@
 import { auth } from "@/app/lib/auth";
-import LoginFlow from "@/app/ui/auth/login/LoginFlow";
+import LoginFlow from "@/app/home/(auth)/i/flow/login/LoginFlow";
 import { redirect } from "next/navigation";
 
 export default async function Page() {

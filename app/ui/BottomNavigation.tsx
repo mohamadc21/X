@@ -12,53 +12,54 @@ import { BiSolidUser, BiUser } from "react-icons/bi";
 import { IoNotifications, IoNotificationsOutline } from "react-icons/io5";
 import { IoMail, IoMailOutline } from "react-icons/io5";
 import { Badge } from "@nextui-org/react";
+import { Session } from "next-auth";
 
-const links = [
-  {
-    href: '/home',
-    text: 'Home',
-    logo: {
-      outline: <GoHome size={25} />,
-      filled: <GoHomeFill size={25} />,
-    },
-  },
-  {
-    href: '/explore',
-    text: 'Explore',
-    logo: {
-      outline: <IoIosSearch size={25} />,
-      filled: <IoIosSearch size={25} />,
-    },
-  },
-  {
-    href: '/notifications',
-    text: 'Notifications',
-    logo: {
-      outline: <IoNotificationsOutline size={25} />,
 
-      filled: <IoNotifications size={25} />,
-    },
-  },
-  {
-    href: '/messages',
-    text: 'Messages',
-    logo: {
-      outline: <IoMailOutline size={25} />,
-      filled: <IoMail size={25} />,
-    },
-  },
-  {
-    href: '/profile',
-    text: 'Profile',
-    logo: {
-      outline: <BiUser size={25} />,
-      filled: <BiSolidUser size={25} />,
-    },
-  },
-]
-
-function BottomNavigation() {
+function BottomNavigation({ session }: { session: Session }) {
   const pathname = usePathname();
+  const links = [
+    {
+      href: '/home',
+      text: 'Home',
+      logo: {
+        outline: <GoHome size={25} />,
+        filled: <GoHomeFill size={25} />,
+      },
+    },
+    {
+      href: '/explore',
+      text: 'Explore',
+      logo: {
+        outline: <IoIosSearch size={25} />,
+        filled: <IoIosSearch size={25} />,
+      },
+    },
+    {
+      href: '/notifications',
+      text: 'Notifications',
+      logo: {
+        outline: <IoNotificationsOutline size={25} />,
+
+        filled: <IoNotifications size={25} />,
+      },
+    },
+    {
+      href: '/messages',
+      text: 'Messages',
+      logo: {
+        outline: <IoMailOutline size={25} />,
+        filled: <IoMail size={25} />,
+      },
+    },
+    {
+      href: `/${session.user.username}`,
+      text: 'Profile',
+      logo: {
+        outline: <BiUser size={25} />,
+        filled: <BiSolidUser size={25} />,
+      },
+    },
+  ]
 
   return (
     <>

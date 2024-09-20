@@ -18,26 +18,34 @@ export interface PasswordData {
 
 export interface User {
   id: number,
-  userId: number,
   name: string,
-  username: string | null,
+  username: string,
   email: string,
   password: string,
-  profile: string | null,
-  birthday: Date,
-  verification_code: string | null,
-  created_at: Date,
-  updated_at: Date
+  profile: string,
+  bio: string | null,
+  location: string | null,
+  website: string | null,
+  header_photo: string | null,
+  birthday: Date | null,
+  created_at: Date | string,
+  updated_at: Date | string
 }
 
-export interface UserViews {
+export interface UserFollowingsAndFollowersTable {
   id: number,
-  twitt_id: number,
-  user_id: number
+  follower_id: number,
+  following_id: number
 }
+
+export interface UserFollowingsAndFollowers {
+  followers: number[],
+  followings: number[]
+}
+
 
 export type SessionUser = {
-  id?: string
+  id?: string | number,
   name?: string | null
   email?: string | null
   image?: string | null
@@ -82,6 +90,7 @@ export interface ModalProps {
   className?: string | undefined,
   defaultOpen?: boolean | undefined,
   isDismissable?: boolean | undefined,
+  defaultBackdrop?: boolean,
   centerContent?: boolean,
   classNames?: {
     base?: string | undefined,
@@ -100,7 +109,7 @@ export interface ModalProps {
 }
 
 export type ActionError = {
-  message?: string
+  message: string
 } | void;
 
 export const SignupScheme: z.ZodType<SignupData> = z.object({

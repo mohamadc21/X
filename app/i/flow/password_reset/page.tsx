@@ -1,4 +1,4 @@
-import PasswordResetFlow from "@/app/ui/auth/passwordreset/PasswordResetFlow";
+import PasswordResetFlow from "./PasswordResetFlow";
 import React from "react";
 
 function Page() {

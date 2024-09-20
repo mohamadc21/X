@@ -13,7 +13,7 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";
 import { LuImage } from "react-icons/lu";
 import { MdGif } from "react-icons/md";
-import { useModalProps } from "../lib/utils";
+import { useModalProps } from "../lib/hooks";
 
 const options = [
   {

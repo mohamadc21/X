@@ -1,7 +1,7 @@
 "use client";
 
 import { addTwitt } from "@/app/lib/actions";
-import { useModalProps } from "@/app/lib/utils";
+import { useModalProps } from "@/app/lib/hooks";
 import { Modal, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/modal";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";

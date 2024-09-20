@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Twitt from "./Twitt";
-import { ITwitt, UserViews } from "../lib/definitions";
+import { ITwitt } from "../lib/definitions";
 import { Session } from "next-auth";
 import LoadingSpinner from "./LoadingSpinner";
 import { pusherClient } from "../lib/pusher";
@@ -60,6 +60,10 @@ function TwittsList({ session, allTwitts }: TwittsListProps) {
       twittsChannel.unbind();
     }
   }, [twitts]);
+
+  useEffect(() => {
+    setTwitts(allTwitts);
+  }, [allTwitts]);
 
   return (
     <div className="overflow-hidden w-full">

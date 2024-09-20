@@ -1,14 +1,14 @@
 "use client";
 
-import { useModalProps } from "@/app/lib/utils";
+import { useModalProps } from "@/app/lib/hooks";
 import { Modal, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/modal";
 import { useRouter } from "next/navigation";
 import React, { Dispatch, SetStateAction, useEffect, useState, useTransition } from "react";
 import LoadingSpinner from "@/app/ui/LoadingSpinner";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
-import Logo from "../../Logo";
-import Alert from "../../Alert";
+import Logo from "@/app/ui/Logo";
+import Alert from "@/app/ui/Alert";
 import Step3 from "./Step3";
 
 type PasswordResetFlow = {
@@ -27,8 +27,7 @@ export type StepsProps = {
 
 function PasswordResetFlow() {
   const [isPending, startTransition] = useTransition();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [isMounted, setIsMounted] = useState(false);
+  const { isOpen, onOpen } = useDisclosure();
   const router = useRouter();
   const [flow, setFlow] = useState<PasswordResetFlow>({
     identy: '',
@@ -44,20 +43,15 @@ function PasswordResetFlow() {
   }
 
   useEffect(() => {
-    setIsMounted(true);
-    if (!isOpen) onOpen();
-  }, [isOpen, onOpen])
-
-  useEffect(() => {
-    if (isMounted) {
-      if (!isOpen) router.push('/');
-    }
-  }, [onOpenChange, isMounted, isOpen, router]);
+    onOpen();
+  }, [])
 
   return (
     <Modal
       isOpen={isOpen}
-      onOpenChange={onOpenChange}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) router.push('/');
+      }}
       {...modalProps({ className: "min-h-[90dvh] overflow-hidden", size: "xl", centerContent: true })}
     >
       <ModalContent>

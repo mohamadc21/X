@@ -5,6 +5,7 @@ import { query } from "./db";
 import { User } from "./definitions";
 import bcrypt from 'bcryptjs';
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 
 declare module "next-auth" {
   interface User {
@@ -73,7 +74,17 @@ export const authConfig: NextAuthConfig = {
       if (request.nextUrl.pathname === '/' && auth?.user) {
         return NextResponse.redirect(new URL('/home', request.url));
       }
-      return Boolean(auth?.user);
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set('x-pathname', request.nextUrl.pathname);
+
+      if (auth?.user) {
+        return NextResponse.next({
+          request: {
+            headers: requestHeaders
+          }
+        })
+      }
+      return false;
     },
     async session({ session, token }) {
       if (!token || !session) return session;

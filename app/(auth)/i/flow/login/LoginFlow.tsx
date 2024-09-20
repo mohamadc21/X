@@ -1,19 +1,17 @@
 "use client";
 
-import { useAppSelector } from "@/app/lib/hooks";
-import { useModalProps } from "@/app/lib/utils";
-import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/modal";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState, useTransition } from "react";
+import { useAppSelector, useModalProps } from "@/app/lib/hooks";
 import LoadingSpinner from "@/app/ui/LoadingSpinner";
-import LoginForm from "./LoginForm";
 import Logo from "@/app/ui/Logo";
+import { Modal, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/modal";
+import { useRouter } from "next/navigation";
+import { useEffect, useTransition } from "react";
+import LoginForm from "./LoginForm";
 import Step2 from "./Step2";
 
 function LoginFlow() {
   const [isPending, startTransition] = useTransition();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [isMounted, setIsMounted] = useState(false);
+  const { isOpen, onOpen } = useDisclosure();
   const router = useRouter();
   const currentStep = useAppSelector(state => state.user.login.step);
   const modalProps = useModalProps;
@@ -23,20 +21,15 @@ function LoginFlow() {
   }
 
   useEffect(() => {
-    setIsMounted(true);
-    if (!isOpen) onOpen();
-  }, [isOpen, onOpen])
-
-  useEffect(() => {
-    if (isMounted) {
-      if (!isOpen) router.push('/');
-    }
-  }, [onOpenChange, isMounted, isOpen, router]);
+    onOpen();
+  }, [])
 
   return (
     <Modal
       isOpen={isOpen}
-      onOpenChange={onOpenChange}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) router.back();
+      }}
       {...modalProps({ className: "min-h-[90dvh] overflow-hidden", size: "xl", centerContent: true })}
     >
       <ModalContent>

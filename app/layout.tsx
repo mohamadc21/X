@@ -37,12 +37,7 @@ export default async function RootLayout({
           <div className="min-h-screen flex flex-col mx-auto xl:max-w-full lg:max-w-[1100px] max-w-3xl pb-4 bg-background text-forground">
             {/* <header></header> */}
             <main className="flex-1 flex flex-col sm:flex-row">
-              {session && (
-                <>
-                  <Header user={session?.user} />
-                  <SidebarWrapper />
-                </>
-              )}
+              {session && <SidebarWrapper />}
               <Suspense fallback={<LoadingSpinner />}>
                 {children}
                 {session && <div className="max-w-[380px] px-6 flex-1 lg:block hidden" />}

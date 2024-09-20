@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "@/app/ui/Logo";
 import { GoHomeFill, GoHome } from "react-icons/go";
 import { PiDotsThreeCircleLight } from "react-icons/pi";
@@ -15,64 +15,72 @@ import { Badge } from "@nextui-org/react";
 import { Session } from "next-auth";
 import Image from "next/image";
 
-const links = [
-  {
-    href: '/home',
-    text: 'Home',
-    logo: {
-      outline: <GoHome size={30} />,
-      filled: <GoHomeFill size={30} />,
-    },
-  },
-  {
-    href: '/explore',
-    text: 'Explore',
-    logo: {
-      outline: <IoIosSearch size={30} />,
-      filled: <IoIosSearch size={30} />,
-    },
-  },
-  {
-    href: '/notifications',
-    text: 'Notifications',
-    logo: {
-      outline: <IoNotificationsOutline size={30} />,
-
-      filled: <IoNotifications size={30} />,
-    },
-  },
-  {
-    href: '/messages',
-    text: 'Messages',
-    logo: {
-      outline: <IoMailOutline size={30} />,
-      filled: <IoMail size={30} />,
-    },
-  },
-  {
-    href: '/profile',
-    text: 'Profile',
-    logo: {
-      outline: <BiUser size={30} />,
-      filled: <BiSolidUser size={30} />,
-    },
-  },
-  {
-    href: null,
-    text: 'More',
-    logo: {
-      outline: <PiDotsThreeCircleLight size={30} />,
-      filled: <PiDotsThreeCircleLight size={30} />
-    }
-  },
-]
 
 function Navigation({ session }: { session: Session }) {
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
+
+  const links = [
+    {
+      href: '/home',
+      text: 'Home',
+      logo: {
+        outline: <GoHome size={30} />,
+        filled: <GoHomeFill size={30} />,
+      },
+    },
+    {
+      href: '/explore',
+      text: 'Explore',
+      logo: {
+        outline: <IoIosSearch size={30} />,
+        filled: <IoIosSearch size={30} />,
+      },
+    },
+    {
+      href: '/notifications',
+      text: 'Notifications',
+      logo: {
+        outline: <IoNotificationsOutline size={30} />,
+
+        filled: <IoNotifications size={30} />,
+      },
+    },
+    {
+      href: '/messages',
+      text: 'Messages',
+      logo: {
+        outline: <IoMailOutline size={30} />,
+        filled: <IoMail size={30} />,
+      },
+    },
+    {
+      href: `/${session.user.username}`,
+      text: 'Profile',
+      logo: {
+        outline: <BiUser size={30} />,
+        filled: <BiSolidUser size={30} />,
+      },
+    },
+    {
+      href: null,
+      text: 'More',
+      logo: {
+        outline: <PiDotsThreeCircleLight size={30} />,
+        filled: <PiDotsThreeCircleLight size={30} />
+      }
+    },
+  ]
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
 
   return (
     <>
-      <ul className="hidden sm:flex flex-col gap-2">
+      <ul className="hidden sm:flex flex-col xl:items-stretch items-center gap-2 w-full max-w-[235px]">
         <li>
           <Button as={Link} href="/home" size="lg" isIconOnly className=" flex hover:no-underline min-w-max items-center xl:px-3 justify-center gap-4 text-xl" variant="light" radius="full">
             <Logo width={30} height={30} />
@@ -109,7 +117,7 @@ function Navigation({ session }: { session: Session }) {
           </li>
         ))}
         <li>
-          <Button color="primary" as={Link} href="/post" size="lg" className="hidden xl:flex w-full hover:no-underline px-3 items-center gap-4 text-xl max-w-[220px] font-medium" radius="full">
+          <Button color="primary" as={Link} href="/post" size="lg" className="hidden xl:flex w-full hover:no-underline px-3 items-center gap-4 text-xl font-medium" radius="full">
             <span className="xl:block hidden">Post</span>
           </Button>
           <Button color="primary" as={Link} href="/post" size="lg" isIconOnly className="xl:hidden flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" radius="full">
@@ -121,16 +129,16 @@ function Navigation({ session }: { session: Session }) {
 
       {session?.user && (
         <>
-          <Button size="lg" variant="light" className="xl:px-3 py-7 px-7 xl:justify-start justify-center items-center hidden xl:flex" radius="full">
-            <div className="flex items-center justify-center gap-3">
+          <Button size="lg" variant="light" className="xl:px-3 py-7 px-7 xl:justify-start justify-center items-center w-full max-w-[235px] hidden xl:flex" radius="full">
+            <div className="flex items-center justify-center overflow-hidden gap-3">
               <Image width={44} height={44} priority={true} alt={session?.user?.name!} src={session.user.image || '/default_white.jpg'} className="rounded-full w-11 h-11" />
-              <div className="text-left xl:flex flex-col items-start justify-center hidden gap-0">
-                <h3 className="font-bold">{session.user.name}</h3>
-                <p className="text-darkgray">@{session.user.username}</p>
+              <div className="text-left xl:flex flex-col items-start justify-center hidden gap-0 truncate">
+                <h3 className="font-bold truncate max-w-full">{session.user.name}</h3>
+                <p className="text-darkgray truncate max-w-full">@{session.user.username} aweaw wae</p>
               </div>
             </div>
           </Button>
-          <Button size="lg" variant="light" className="xl:px-3 xl:py-7 xl:justify-start justify-center items-center sm:block hidden min-w-0" isIconOnly radius="full">
+          <Button size="lg" variant="light" className="xl:px-3 xl:py-7 xl:justify-start justify-center items-center sm:flex hidden min-w-0" isIconOnly radius="full">
             <div className="flex items-center justify-center gap-3">
               <Image width={44} height={44} priority={true} alt={session?.user?.name!} src={session.user.image || '/default_white.jpg'} className="rounded-full w-11 h-11" />
               <div className="text-left xl:flex flex-col items-start justify-center hidden gap-0">

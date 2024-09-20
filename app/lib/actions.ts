@@ -3,13 +3,14 @@
 import { ID } from "appwrite";
 import { storage } from "./appwrite";
 import { auth, signIn, signOut } from "./auth";
-import { getAlltwitts, query } from "./db";
+import { getAlltwitts, getUserById, getUserByUsername, getUserFollowersAndFollowings, query } from "./db";
 import { ActionError, AddTwitt, PasswordData, SignupData, User, Verification } from "./definitions";
 import { sendMail } from "./sendMail";
 import { AuthError } from "next-auth";
 import bcrypt from 'bcryptjs';
 import { redirect } from "next/navigation";
 import { pusherServer } from "./pusher";
+import { revalidatePath } from "next/cache";
 
 interface CredentialsData extends SignupData, PasswordData { }
 interface OAuthData {
@@ -229,6 +230,41 @@ export async function uploadProfile(formData: FormData): Promise<ActionError> {
   }
 
 }
+export async function uploadHeaderPhoto(formData: FormData): Promise<ActionError> {
+
+  const allowedTypes = ['image/jpeg', 'image/pjp', 'image/png', 'image/jpg', 'image/pjpeg', 'image/jfif', 'image/webp']
+
+  const file = <File>formData.get('upload')!;
+  const email = <string>formData.get('email')!;
+  const fileSize = Math.floor(file.size / 1024);
+
+  if (!allowedTypes.includes(file.type)) return {
+    message: `image type not allowed. only ${allowedTypes.join(', ')} files`
+  };
+
+  if (fileSize > 700) return {
+    message: 'upload size must be less than 700 KB.'
+  };
+
+  try {
+    const upload = await storage.createFile(
+      process.env.APPWRITE_USERS_HEADER_PHOTO_BUCKET_ID!,
+      ID.unique(),
+      file
+    );
+
+    const uploadUrl = storage.getFileView(process.env.APPWRITE_USERS_HEADER_PHOTO_BUCKET_ID!, upload.$id);
+
+    await query("update users set header_photo = ? where email = ?", [uploadUrl.toString(), email])
+
+  } catch (err) {
+    console.error(err);
+    return {
+      message: 'an error occurred'
+    };
+  }
+
+}
 
 export async function uploadTwittImage(formData: FormData): Promise<any> {
 
@@ -380,4 +416,67 @@ export async function triggerTwitts() {
   } catch (err) {
     console.error(err);
   }
+}
+
+export async function follow(follower_id: number | string, following_id: number | string) {
+  const exists = await query("select id from follows where follower_id = ? and following_id = ?", [follower_id, following_id]);
+  if (exists.length > 0) return;
+
+  await query("insert into follows (follower_id, following_id) values (?,?)", [
+    follower_id,
+    following_id
+  ]);
+
+  const userFollows = await getUserFollowersAndFollowings(following_id);
+  await pusherServer.trigger('profile', 'follows', {
+    follows: userFollows,
+  });
+}
+
+export async function unFollow(follower_id: number | string, following_id: number | string) {
+  await query("delete from follows where follower_id = ? and following_id = ?", [follower_id, following_id]);
+
+  const userFollows = await getUserFollowersAndFollowings(following_id);
+  await pusherServer.trigger("profile", "follows", {
+    follows: userFollows
+  });
+}
+
+export async function updateUserInfo(formData: FormData): Promise<ActionError> {
+  const name = formData.get("name") as string;
+  const email = formData.get("email") as string;
+  const username = formData.get("username") as string;
+  const bio = formData.get("bio") as string;
+  const website = formData.get("website") as string;
+  const location = formData.get("location") as string;
+  const header_photo_upload = formData.get("header_photo_upload") as string;
+  const profile_photo_upload = formData.get("profile_photo_upload") as string;
+
+  let updateQuery = "update users set name=?, bio=?, website=?, location=?";
+  const params = [name, bio, website, location];
+
+  if (header_photo_upload) {
+    const formData = new FormData();
+    formData.append('upload', header_photo_upload);
+    formData.append('email', email);
+    const error = await uploadHeaderPhoto(formData);
+    if (error) return error;
+  }
+
+  if (profile_photo_upload) {
+    const formData = new FormData();
+    formData.append('upload', profile_photo_upload);
+    formData.append('email', email);
+    const error = await uploadProfile(formData);
+    if (error) return error;
+  }
+
+  try {
+    await query(updateQuery, params);
+    revalidatePath(`/${username}`);
+  } catch (err) {
+    console.error(err);
+    return { message: "an error occurred" };
+  }
+
 }
