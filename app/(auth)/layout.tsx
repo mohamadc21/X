@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import SignupForm from "@/app/home/(auth)/i/flow/signup/SignupForm";
+import SignupForm from "@/app/(auth)/i/flow/signup/SignupForm";
 import LoadingSpinner from "@/app/ui/LoadingSpinner";
 
 export default function Layout({
