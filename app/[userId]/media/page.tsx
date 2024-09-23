@@ -1,9 +1,9 @@
+import { auth } from "@/app/lib/auth";
+import { getUserByUsername } from "@/app/lib/db";
+import { getUserTwittsByMedia } from '@/app/lib/actions';
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getUserByUsername, getUserFollowersAndFollowings } from "@/app/lib/db";
 import TwittsList from "@/app/ui/TwittsList";
-import { auth } from "@/app/lib/auth";
-import UserProfile from "../UserProfile";
 
 export async function generateMetadata({ params }: { params: { userId: string } }): Promise<Metadata | void> {
   const user = await getUserByUsername(params.userId);
@@ -15,15 +15,25 @@ export async function generateMetadata({ params }: { params: { userId: string } 
 }
 
 async function Page({ params }: { params: { userId: string } }) {
-  const [user, session] = await Promise.all([
-    getUserByUsername(params.userId),
+  const [userTwitts, session] = await Promise.all([
+    getUserTwittsByMedia(params.userId),
     auth()
   ]);
-  if (!user) notFound();
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-center">You haven&apos;t posted any medias such as photos, videos or gifs</h1>
+    <div className="px-1">
+      {userTwitts.length > 0 ? (
+        <TwittsList mediaOnly session={session} allTwitts={userTwitts} />
+      ) : (
+        <div className="mx-auto max-w-xs">
+          <h1 className="text-3xl font-extrabold mb-1">
+            {params.userId === session?.user.username ? "You hasn't posted media" : `@${params.userId}hasn't posted media`}
+          </h1>
+          <p className="text-default-400">
+            Once {params.userId === session?.user.username ? "you" : `they`} do, those posts will show up here.
+          </p>
+        </div>
+      )}
     </div>
   )
 }

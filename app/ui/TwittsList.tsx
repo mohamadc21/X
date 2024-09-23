@@ -10,9 +10,10 @@ import { pusherClient } from "../lib/pusher";
 type TwittsListProps = {
   session: Session | null,
   allTwitts: ITwitt[],
+  mediaOnly?: boolean
 }
 
-function TwittsList({ session, allTwitts }: TwittsListProps) {
+function TwittsList({ session, allTwitts, mediaOnly = false }: TwittsListProps) {
   const [twitts, setTwitts] = useState(allTwitts);
 
   useEffect(() => {
@@ -64,17 +65,46 @@ function TwittsList({ session, allTwitts }: TwittsListProps) {
   useEffect(() => {
     setTwitts(allTwitts);
   }, [allTwitts]);
+  const groupedTwitts = [];
+  for (let i = 0; i < twitts.length; i += 3) {
+    groupedTwitts.push(twitts.slice(i, i + 3));
+  }
 
   return (
-    <div className="overflow-hidden w-full">
-      {twitts?.map(twitt => (
-        <Twitt
-          user={session?.user!}
-          key={twitt.id}
-          twitt={twitt}
-          setTwitts={setTwitts}
-        />
-      ))}
+    <div
+      className={`overflow-hidden w-full`}
+    >
+      {mediaOnly ? (
+        <>
+          {groupedTwitts?.map((group, idx) => (
+            <div key={idx} className="flex gap-1">
+              {group.map(twitt => (
+                <div className="w-[33.33%]">
+                  <Twitt
+                    user={session?.user!}
+                    key={twitt.id}
+                    twitt={twitt}
+                    setTwitts={setTwitts}
+                    mediaOnly={mediaOnly}
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </>
+      ) : (
+        <>
+          {twitts?.map((twitt, idx) => (
+            <Twitt
+              user={session?.user!}
+              key={twitt.id}
+              twitt={twitt}
+              setTwitts={setTwitts}
+              mediaOnly={mediaOnly}
+            />
+          ))}
+        </>
+      )}
     </div>
   )
 }

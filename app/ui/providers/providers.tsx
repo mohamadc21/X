@@ -1,23 +1,25 @@
 "use client";
 
 import { NextUIProvider } from "@nextui-org/react";
-import React, { useEffect } from "react";
-import StoreProvider from "./StoreProvider";
-import NextThemeProvider from "./NextThemeProvider";
+import React from "react";
 import { SWRDevTools } from "swr-devtools";
+import NextThemeProvider from "./NextThemeProvider";
+import StoreProvider from "./StoreProvider";
+import { SessionProvider } from 'next-auth/react';
 
 function Providers({ children }: { children: React.ReactNode }) {
-
   return (
-    <StoreProvider>
-      <SWRDevTools >
-        <NextUIProvider>
-          <NextThemeProvider>
-            {children}
-          </NextThemeProvider>
-        </NextUIProvider>
-      </SWRDevTools>
-    </StoreProvider>
+    <SessionProvider>
+      <StoreProvider>
+        <SWRDevTools >
+          <NextUIProvider>
+            <NextThemeProvider>
+              {children}
+            </NextThemeProvider>
+          </NextUIProvider>
+        </SWRDevTools>
+      </StoreProvider>
+    </SessionProvider>
   );
 };
 

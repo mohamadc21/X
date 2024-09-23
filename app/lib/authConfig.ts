@@ -1,23 +1,16 @@
-import { NextAuthConfig, DefaultSession, AuthError } from "next-auth";
+import bcrypt from 'bcryptjs';
+import { AuthError, DefaultSession, NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import { query } from "./db";
-import { User } from "./definitions";
-import bcrypt from 'bcryptjs';
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
+import { SessionUser, User } from "./definitions";
 
 declare module "next-auth" {
-  interface User {
-    id?: string,
-    email?: string | null,
-    username?: string | null
-  }
 
   interface Session {
-    user: User & DefaultSession["user"]
-    expires: string
-    error: string
+    user: SessionUser,
+    expires: string;
+    error: string;
   }
 }
 
@@ -56,12 +49,12 @@ export const authConfig: NextAuthConfig = {
           if (!matchPasswords) throw new CustomAuthError('Wrong password!');
         }
 
-
         return {
           id: user.id.toString(),
           name: user.name,
+          username: user.username,
           email: user.email,
-          image: user.profile,
+          image: user.profile
         }
       },
     }),
@@ -86,23 +79,46 @@ export const authConfig: NextAuthConfig = {
       }
       return false;
     },
-    async session({ session, token }) {
-      if (!token || !session) return session;
-      const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=` + session.user.email);
-      if (res.status !== 200) return session;
-      // throw new Error(`an error occurred in session callback: ${res.statusText}`);
-      const data: User = await res.json();
-
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          name: data.name,
-          id: data.id.toString(),
-          image: data.profile,
-          username: data.username,
+    jwt: async ({ token, user, trigger, session }) => {
+      if (!token.user) {
+        const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=` + token.email);
+        if (res.status !== 200) return token;
+        const data: User = await res.json();
+        token = {
+          ...token, user: {
+            id: data.id,
+            name: data.name,
+            email: data.email,
+            username: data.username,
+            image: data.profile,
+          }
         }
       }
+      if (trigger === 'update' && session) {
+        token = { ...token, user: session.user };
+        console.log(session);
+      }
+      return token;
+    },
+    session: async ({ session, token }) => {
+      session.user = token.user as any;
+      return session;
+      //       if (!token || !session) return session;
+      //       const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=` + session.user.email);
+      //       if (res.status !== 200) return session;
+      //       // throw new Error(`an error occurred in session callback: ${res.statusText}`);
+      //       const data: User = await res.json();
+      // 
+      //       return {
+      //         ...session,
+      //         user: {
+      //           ...session.user,
+      //           name: data.name,
+      //           id: data.id.toString(),
+      //           image: data.profile,
+      //           username: data.username,
+      //         }
+      //       }
     },
     signIn: async ({ user, credentials }) => {
       const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=` + user.email);

@@ -14,7 +14,7 @@ import { IoMail, IoMailOutline } from "react-icons/io5";
 import { Badge } from "@nextui-org/react";
 import { Session } from "next-auth";
 import Image from "next/image";
-
+import { updateSession } from "../lib/actions";
 
 function Navigation({ session }: { session: Session }) {
   const [isMounted, setIsMounted] = useState(false);
@@ -131,7 +131,7 @@ function Navigation({ session }: { session: Session }) {
         <>
           <Button size="lg" variant="light" className="xl:px-3 py-7 px-7 xl:justify-start justify-center items-center w-full max-w-[235px] hidden xl:flex" radius="full">
             <div className="flex items-center justify-center overflow-hidden gap-3">
-              <Image width={44} height={44} priority={true} alt={session?.user?.name!} src={session.user.image || '/default_white.jpg'} className="rounded-full w-11 h-11" />
+              <Image width={44} height={44} priority={true} alt={session?.user?.name!} src={session.user.image || '/default_white.jpg'} className="rounded-full w-11 h-11 flex-shrink-0" />
               <div className="text-left xl:flex flex-col items-start justify-center hidden gap-0 truncate">
                 <h3 className="font-bold truncate max-w-full">{session.user.name}</h3>
                 <p className="text-darkgray truncate max-w-full">@{session.user.username} aweaw wae</p>

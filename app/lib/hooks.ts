@@ -57,10 +57,10 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
     isDismissable: props?.isDismissable || false,
     classNames: {
       backdrop: `${props?.classNames?.backdrop} ${props?.defaultBackdrop || 'bg-gray-700/70'}`,
-      header: `${props?.classNames?.header || ''}`,
-      body: `${props?.classNames?.body} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'} pb-4 pt-8`,
+      header: `${props?.classNames?.header || ''} z-[3] bg-background`,
+      body: `${props?.classNames?.body} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'} pb-4 pt-8 overflow-y-auto`,
       footer: `${props?.classNames?.footer} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'}`,
-      closeButton: `text-xl left-2.5 right-[none] top-3 ${props?.classNames?.closeButton}`,
+      closeButton: `text-xl left-2.5 right-[none] z-[4] top-3 ${props?.classNames?.closeButton}`,
     },
     radius: props?.radius || "lg",
     scrollBehavior: inMobile ? undefined : (props?.scrollBehavior || "inside"),

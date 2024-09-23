@@ -14,7 +14,7 @@ function Error({ error, reset }: { error: Error & { digest?: string }, reset: ()
     // setText(error.name);
   }, [error])
   return (
-    <div className="flex flex-col items-center justify-center flex-1">
+    <div className="flex flex-col items-center h-full justify-center flex-1">
       <h1 className="text-lg mb-4 text-default-400">{text}</h1>
       <Button color="primary" radius="full" className="w-max gap-1 text-base font-bold" onClick={reset}><TbReload size={20} /><span>Retry</span></Button>
     </div>

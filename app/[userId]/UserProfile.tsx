@@ -29,12 +29,12 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: {
   const dispatch = useAppDispatch();
 
   async function handleLike() {
-    setProfileDetails(prev => ({ ...prev, follows: { ...follows, followers: [...prev.follows.followers, sessionUser?.id! as number] } }));
+    setProfileDetails(prev => ({ ...prev, follows: { ...follows, followers: [...prev.follows.followers, sessionUser?.id! as unknown as number] } }));
     await follow(sessionUser?.id!, user.id);
   }
 
   async function handleUnlike() {
-    setProfileDetails(prev => ({ ...prev, follows: { ...follows, followers: prev.follows.followers.filter(follower => follower != sessionUser?.id! as unknown as number) } }));
+    setProfileDetails(prev => ({ ...prev, follows: { ...follows, followers: prev.follows.followers.filter(follower => follower != sessionUser?.id) } }));
     await unFollow(sessionUser?.id!, user.id);
   }
 

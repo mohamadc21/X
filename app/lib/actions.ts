@@ -2,9 +2,9 @@
 
 import { ID } from "appwrite";
 import { storage } from "./appwrite";
-import { auth, signIn, signOut } from "./auth";
+import { auth, signIn, signOut, unstable_update } from "./auth";
 import { getAlltwitts, getUserById, getUserByUsername, getUserFollowersAndFollowings, query } from "./db";
-import { ActionError, AddTwitt, PasswordData, SignupData, User, Verification } from "./definitions";
+import { ActionError, AddTwitt, ITwitt, PasswordData, SignupData, User, Verification } from "./definitions";
 import { sendMail } from "./sendMail";
 import { AuthError } from "next-auth";
 import bcrypt from 'bcryptjs';
@@ -207,9 +207,9 @@ export async function uploadProfile(formData: FormData): Promise<ActionError> {
     message: `image type not allowed. only ${allowedTypes.join(', ')} files`
   };
 
-  if (fileSize > 700) return {
-    message: 'upload size must be less than 700 KB.'
-  };
+  // if (fileSize > 700) return {
+  //   message: 'upload size must be less than 700 KB.'
+  // };
 
   try {
     const upload = await storage.createFile(
@@ -242,9 +242,9 @@ export async function uploadHeaderPhoto(formData: FormData): Promise<ActionError
     message: `image type not allowed. only ${allowedTypes.join(', ')} files`
   };
 
-  if (fileSize > 700) return {
-    message: 'upload size must be less than 700 KB.'
-  };
+  // if (fileSize > 700) return {
+  //   message: 'upload size must be less than 700 KB.'
+  // };
 
   try {
     const upload = await storage.createFile(
@@ -479,4 +479,19 @@ export async function updateUserInfo(formData: FormData): Promise<ActionError> {
     return { message: "an error occurred" };
   }
 
+}
+
+export async function updateSession(data: any) {
+  const resp = await fetch(`${process.env.AUTH_URL}/api/session`, {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+
+  const respData = await resp.json();
+  console.log(respData);
+}
+
+export async function getUserTwittsByMedia(user_id: number | string) {
+  const twitts = await query<ITwitt>(`select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where users.id = ? or users.username = ? and not media is null order by twitts.id desc`, [user_id, user_id]);
+  return twitts;
 }

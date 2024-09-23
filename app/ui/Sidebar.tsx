@@ -1,8 +1,6 @@
-import { Avatar, Button } from "@nextui-org/react";
 import { auth } from "../lib/auth";
-import Navigation from "./Navigation";
-import Image from "next/image";
 import BottomNavigation from "./BottomNavigation";
+import Navigation from "./Navigation";
 
 async function Sidebar() {
   const session = await auth();

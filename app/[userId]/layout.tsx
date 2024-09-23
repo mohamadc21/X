@@ -14,19 +14,19 @@ async function Layout({ children, modal, params }: { children: React.ReactNode, 
 
   const follows = await getUserFollowersAndFollowings(user.id);
   const userInfo: User = {
-    id: user?.id!,
-    name: user?.name!,
-    username: user?.username!,
+    id: user?.id,
+    name: user?.name,
+    username: user?.username,
     password: '',
-    email: user?.email!,
+    email: user?.email,
     bio: user?.bio,
     website: user?.website,
     location: user?.location,
     header_photo: user?.header_photo,
-    profile: user?.profile!,
-    birthday: user?.birthday!,
-    created_at: user?.created_at!,
-    updated_at: user?.updated_at!
+    profile: user?.profile,
+    birthday: user?.birthday,
+    created_at: user?.created_at,
+    updated_at: user?.updated_at
   };
 
   return (

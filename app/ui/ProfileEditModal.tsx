@@ -125,7 +125,7 @@ function ProfileEditModal({ user }: { user: User & { twitts: ITwitt[] } }) {
           <h2 className="text-xl">Edit Profile</h2>
           <Button type="submit" onClick={handleProfileEdit} isLoading={isPending} spinner={<LoadingSpinner size="sm" noPadding />} size="sm" className="text-base" color="secondary" radius="full">Save</Button>
         </ModalHeader>
-        <ModalBody className="-mt-4">
+        <ModalBody className="-mt-8">
           <div className="min-h-[200px] overflow-hidden flex items-center justify-center">
             {userInfo.header_photo.default || userInfo.header_photo.temp ? (
               <div className="min-h-[200px] w-full relative">

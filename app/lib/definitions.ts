@@ -45,10 +45,11 @@ export interface UserFollowingsAndFollowers {
 
 
 export type SessionUser = {
-  id?: string | number,
-  name?: string | null
-  email?: string | null
-  image?: string | null
+  id: string | number,
+  name: string
+  email: string
+  image: string,
+  username: string
 }
 
 export interface AddTwitt {
