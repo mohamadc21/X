@@ -1,12 +1,11 @@
 import bcrypt from 'bcryptjs';
-import { AuthError, DefaultSession, NextAuthConfig } from "next-auth";
+import { AuthError, NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { NextResponse } from "next/server";
 import { SessionUser, User } from "./definitions";
 
 declare module "next-auth" {
-
   interface Session {
     user: SessionUser,
     expires: string;
@@ -50,7 +49,7 @@ export const authConfig: NextAuthConfig = {
         }
 
         return {
-          id: user.id.toString(),
+          id: user.id as string,
           name: user.name,
           username: user.username,
           email: user.email,
@@ -79,8 +78,8 @@ export const authConfig: NextAuthConfig = {
       }
       return false;
     },
-    jwt: async ({ token, user, trigger, session }) => {
-      if (!token.user) {
+    jwt: async ({ token, trigger }) => {
+      if (!token.user || trigger === 'update') {
         const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=` + token.email);
         if (res.status !== 200) return token;
         const data: User = await res.json();
@@ -94,31 +93,11 @@ export const authConfig: NextAuthConfig = {
           }
         }
       }
-      if (trigger === 'update' && session) {
-        token = { ...token, user: session.user };
-        console.log(session);
-      }
       return token;
     },
     session: async ({ session, token }) => {
       session.user = token.user as any;
       return session;
-      //       if (!token || !session) return session;
-      //       const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=` + session.user.email);
-      //       if (res.status !== 200) return session;
-      //       // throw new Error(`an error occurred in session callback: ${res.statusText}`);
-      //       const data: User = await res.json();
-      // 
-      //       return {
-      //         ...session,
-      //         user: {
-      //           ...session.user,
-      //           name: data.name,
-      //           id: data.id.toString(),
-      //           image: data.profile,
-      //           username: data.username,
-      //         }
-      //       }
     },
     signIn: async ({ user, credentials }) => {
       const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=` + user.email);

@@ -22,7 +22,7 @@ function LoginFlow() {
 
   useEffect(() => {
     onOpen();
-  }, [])
+  }, [onOpen])
 
   return (
     <Modal

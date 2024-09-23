@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Twitt from "./Twitt";
 import { ITwitt } from "../lib/definitions";
 import { Session } from "next-auth";
-import LoadingSpinner from "./LoadingSpinner";
 import { pusherClient } from "../lib/pusher";
 
 type TwittsListProps = {
@@ -79,10 +78,9 @@ function TwittsList({ session, allTwitts, mediaOnly = false }: TwittsListProps) 
           {groupedTwitts?.map((group, idx) => (
             <div key={idx} className="flex gap-1">
               {group.map(twitt => (
-                <div className="w-[33.33%]">
+                <div className="w-[33.33%]" key={twitt.id}>
                   <Twitt
                     user={session?.user!}
-                    key={twitt.id}
                     twitt={twitt}
                     setTwitts={setTwitts}
                     mediaOnly={mediaOnly}

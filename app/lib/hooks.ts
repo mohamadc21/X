@@ -1,7 +1,7 @@
-import { useDispatch, useSelector, useStore } from 'react-redux';
-import { AppDispatch, AppStore, RootState } from "./store";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
 import { ModalProps } from "./definitions";
+import { AppDispatch, AppStore, RootState } from "./store";
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();
@@ -11,18 +11,19 @@ export const useIsVisible = (ref: React.RefObject<HTMLElement>) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    const elementRef = ref.current;
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !isVisible) {
         setIsVisible(true);
       }
     });
 
-    if (ref.current) {
-      observer.observe(ref.current);
+    if (elementRef) {
+      observer.observe(elementRef);
     }
 
     return () => {
-      if (ref.current) {
+      if (elementRef) {
         observer.disconnect();
       }
     }

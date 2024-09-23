@@ -2,7 +2,6 @@ import { auth } from "@/app/lib/auth";
 import { getUserByUsername } from "@/app/lib/db";
 import { getUserTwittsByMedia } from '@/app/lib/actions';
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
 import TwittsList from "@/app/ui/TwittsList";
 
 export async function generateMetadata({ params }: { params: { userId: string } }): Promise<Metadata | void> {

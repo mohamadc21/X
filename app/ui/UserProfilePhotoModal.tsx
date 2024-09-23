@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 function UserProfilePhotoModal({ mode }: { mode: 'profile' | 'header' }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen } = useDisclosure();
   const userInfo = useAppSelector(state => state.user.user.info);
   const router = useRouter();
   const pathname = usePathname();

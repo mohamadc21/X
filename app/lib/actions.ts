@@ -1,16 +1,15 @@
 "use server";
 
 import { ID } from "appwrite";
-import { storage } from "./appwrite";
-import { auth, signIn, signOut, unstable_update } from "./auth";
-import { getAlltwitts, getUserById, getUserByUsername, getUserFollowersAndFollowings, query } from "./db";
-import { ActionError, AddTwitt, ITwitt, PasswordData, SignupData, User, Verification } from "./definitions";
-import { sendMail } from "./sendMail";
-import { AuthError } from "next-auth";
 import bcrypt from 'bcryptjs';
-import { redirect } from "next/navigation";
-import { pusherServer } from "./pusher";
+import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
+import { storage } from "./appwrite";
+import { signIn } from "./auth";
+import { getAlltwitts, getUserFollowersAndFollowings, query } from "./db";
+import { ActionError, AddTwitt, ITwitt, PasswordData, SignupData, Verification } from "./definitions";
+import { pusherServer } from "./pusher";
+import { sendMail } from "./sendMail";
 
 interface CredentialsData extends SignupData, PasswordData { }
 interface OAuthData {
@@ -158,9 +157,10 @@ export async function signupWithCredentials(data: CredentialsData): Promise<Acti
   const birthDay = new Date(`${year}-${month}-${day}`).toISOString();
   const hashedPass = await bcrypt.hash(password, 10);
   const username = name.split(' ')[0] + Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+  const defaultProfile = 'https://cloud.appwrite.io/v1/storage/buckets/66d0a02800176fb696ad/files/66ede78f000632afeb19/view?project=66d09f8b003509928242&project=66d09f8b003509928242';
 
   try {
-    await query("insert into users (name, email, password, username, birthday) values (?,?,?,?,?)", [name, email, hashedPass, username, birthDay]);
+    await query("insert into users (name, email, password, username, profile, birthday) values (?,?,?,?,?, ?)", [name, email, hashedPass, username, defaultProfile, birthDay]);
     await signIn('credentials', { email, password, redirect: false });
   } catch (err) {
     if (err instanceof AuthError) {
@@ -452,8 +452,8 @@ export async function updateUserInfo(formData: FormData): Promise<ActionError> {
   const header_photo_upload = formData.get("header_photo_upload") as string;
   const profile_photo_upload = formData.get("profile_photo_upload") as string;
 
-  let updateQuery = "update users set name=?, bio=?, website=?, location=?";
-  const params = [name, bio, website, location];
+  let updateQuery = "update users set name=?, bio=?, website=?, location=? where email = ?";
+  const params = [name, bio, website, location, email];
 
   if (header_photo_upload) {
     const formData = new FormData();
@@ -479,16 +479,6 @@ export async function updateUserInfo(formData: FormData): Promise<ActionError> {
     return { message: "an error occurred" };
   }
 
-}
-
-export async function updateSession(data: any) {
-  const resp = await fetch(`${process.env.AUTH_URL}/api/session`, {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
-
-  const respData = await resp.json();
-  console.log(respData);
 }
 
 export async function getUserTwittsByMedia(user_id: number | string) {

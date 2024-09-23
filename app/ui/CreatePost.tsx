@@ -140,7 +140,7 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
       setGifs([]);
       setSearch('');
     }
-  }, []);
+  }, [gf]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -202,7 +202,9 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                 </div>
                 {image.temp && (
                   <div className="relative">
-                    <img className="w-full h-full rounded-2xl" src={image.temp} />
+                    <div className="relative">
+                      <Image fill className="w-full h-full rounded-2xl object-cover" src={image.temp} alt={`${user.name}s post image`} />
+                    </div>
                     <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setImage({ upload: null, temp: null })}>
                       <IoClose size="20" />
                     </Button>

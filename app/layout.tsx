@@ -1,17 +1,9 @@
-import type { Metadata } from "next";
-import Providers from "@/app/ui/providers/providers";
-import chirp from "@/app/ui/fonts/chirp";
 import "@/app/styles/globals.css";
-import { Suspense } from "react";
-import Sidebar from "@/app/ui/Sidebar";
+import chirp from "@/app/ui/fonts/chirp";
+import Providers from "@/app/ui/providers/providers";
+import type { Metadata } from "next";
 import { auth } from "./lib/auth";
-import Twitts from "./ui/TwittsList";
-import LoadingSpinner from "./ui/LoadingSpinner";
-import TwittsWrapper from "./ui/TwittsWrapper";
-import { Button, ButtonGroup } from "@nextui-org/button";
 import SidebarWrapper from "./ui/SidebarWrapper";
-import Header from "./ui/Header";
-import { errorMonitor } from "events";
 
 export const metadata: Metadata = {
   title: {

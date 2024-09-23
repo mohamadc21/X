@@ -21,7 +21,7 @@ function Step6() {
       dispatch(setSignupData({ data: null, step: 1 }));
       router.push('/home');
     }
-  }, [requestedPermission, dispatch]);
+  }, [requestedPermission, dispatch, router]);
 
   return (
     <ModalBody className="flex flex-col justify-center gap-7">

@@ -7,12 +7,11 @@ import { TbReload } from "react-icons/tb";
 
 function Error({ error, reset }: { error: Error & { digest?: string }, reset: () => void }) {
   const [text, setText] = useState('Something went wrong. try reloading.');
-  const { isOpen, onOpenChange, onOpen } = useDisclosure()
+  const { onOpen } = useDisclosure()
 
   useEffect(() => {
     onOpen();
-    // setText(error.name);
-  }, [error])
+  }, [error, onOpen])
   return (
     <div className="flex flex-col items-center h-full justify-center flex-1">
       <h1 className="text-lg mb-4 text-default-400">{text}</h1>

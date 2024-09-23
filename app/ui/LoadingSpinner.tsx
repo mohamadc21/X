@@ -1,4 +1,3 @@
-import React, { HTMLAttributes } from "react";
 
 function LoadingSpinner({ wrapperClassName, noPadding = false, className, color, size = 'default', type = 'default' }: { wrapperClassName?: string, className?: string, color?: string, size?: 'sm' | 'default', type?: 'default' | 'fullscreen', noPadding?: boolean }) {
 

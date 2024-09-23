@@ -6,11 +6,13 @@ import { CameraOutlined } from "@ant-design/icons";
 import { uploadProfile } from "@/app/lib/actions";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import { setSignupData } from "@/app/lib/slices/userSlice";
+import { useSession } from "next-auth/react";
 
 function Step4({ onTransition }: { onTransition: (callback: () => Promise<any>) => void }) {
   const [error, setError] = useState<string | null>(null);
   const user = useAppSelector(state => state.user.signup.data);
   const dispatch = useAppDispatch();
+  const { update } = useSession();
 
   async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
     setError(null);
@@ -21,10 +23,10 @@ function Step4({ onTransition }: { onTransition: (callback: () => Promise<any>) 
       formData.append('upload', file);
       formData.append('email', user!.email);
       const error = await uploadProfile(formData);
-
       if (error) {
         return setError(error.message!);
       }
+      update('trigger');
       dispatch(setSignupData({ data: { ...user! }, step: 5 }));
     })
   }

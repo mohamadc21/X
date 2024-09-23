@@ -10,9 +10,9 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState, useTransition } from "react";
 import { MdAddAPhoto, MdClose } from "react-icons/md";
 import { updateUserInfo } from "../lib/actions";
-import { useFormStatus } from "react-dom";
 import LoadingSpinner from "./LoadingSpinner";
 import Alert from "./Alert";
+import { useSession } from "next-auth/react";
 
 type UserInfo = {
   name: string;
@@ -60,6 +60,7 @@ function ProfileEditModal({ user }: { user: User & { twitts: ITwitt[] } }) {
   const profilePhotoUploadRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const { update } = useSession();
 
   function handleUploadChange(e: React.ChangeEvent<HTMLInputElement>) {
     const inputName = e.target.name;
@@ -89,6 +90,7 @@ function ProfileEditModal({ user }: { user: User & { twitts: ITwitt[] } }) {
     startTransition(async () => {
       const error = await updateUserInfo(formData);
       if (error) return setError(error.message);
+      update('trigger');
       router.replace(`/${user.username}`);
     })
   }

@@ -25,7 +25,7 @@ function CredentialsFlow() {
 
   useEffect(() => {
     onOpen();
-  }, [])
+  }, [onOpen])
 
   return (
     <Modal

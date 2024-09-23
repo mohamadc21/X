@@ -11,6 +11,7 @@ import { updateUsername, usernameIsUnique } from "@/app/lib/actions";
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
 import Alert from "@/app/ui/Alert";
 import { setSignupData } from "@/app/lib/slices/userSlice";
+import { useSession } from "next-auth/react";
 
 interface Username {
   username?: string;
@@ -30,11 +31,11 @@ function Step5({ onTransition }: { onTransition: (callback: () => Promise<any>) 
   const formRef = useRef<HTMLFormElement>(null);
   const signupState = useAppSelector(state => state.user.signup.data);
   const dispatch = useAppDispatch();
-
   const { register, handleSubmit, formState: { errors, isValid, }, setError, watch } = useForm<Username>({
     mode: 'onTouched',
     resolver: zodResolver(UsernameScheme),
   });
+  const { update } = useSession();
 
   useEffect(() => {
     if (username.length < 4) return;
@@ -59,6 +60,7 @@ function Step5({ onTransition }: { onTransition: (callback: () => Promise<any>) 
           message: error.message
         });
       }
+      update('trigger');
       dispatch(setSignupData({ data: { ...signupState! }, step: 6 }));
     })
   }

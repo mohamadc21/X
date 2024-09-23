@@ -14,7 +14,6 @@ import { IoMail, IoMailOutline } from "react-icons/io5";
 import { Badge } from "@nextui-org/react";
 import { Session } from "next-auth";
 import Image from "next/image";
-import { updateSession } from "../lib/actions";
 
 function Navigation({ session }: { session: Session }) {
   const [isMounted, setIsMounted] = useState(false);

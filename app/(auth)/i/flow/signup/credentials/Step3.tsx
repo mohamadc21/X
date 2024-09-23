@@ -12,12 +12,14 @@ import { PasswordData, PasswordScheme } from "@/app/lib/definitions";
 import { useDispatch } from "react-redux";
 import Alert from "@/app/ui/Alert";
 import { setSignupData } from "@/app/lib/slices/userSlice";
+import { useSession } from "next-auth/react";
 
 
 function Step3({ onTransition }: { onTransition: (callback: () => Promise<any>) => void }) {
   const formRef = useRef<HTMLFormElement>(null);
   const signupState = useAppSelector(state => state.user.signup.data);
   const dispatch = useDispatch();
+  const { update } = useSession();
 
   const { register, handleSubmit, formState: { errors, isValid }, setError } = useForm<PasswordData>({
     mode: 'onTouched',
@@ -30,6 +32,7 @@ function Step3({ onTransition }: { onTransition: (callback: () => Promise<any>) 
       if (error) return setError('root', {
         message: error.message
       });
+      update('trigger');
       dispatch(setSignupData({ data: { ...signupState! }, step: 4 }));
     })
   }

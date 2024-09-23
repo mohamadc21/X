@@ -1,16 +1,16 @@
-import { Avatar, Button, Card, CardHeader } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import { format } from "date-fns";
-import { ITwitt, SessionUser } from "../lib/definitions";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useEffect, useOptimistic, useRef, useState } from "react";
 import { FaHeart, FaRegComment, FaRegHeart } from "react-icons/fa";
-import { LuRepeat2 } from "react-icons/lu";
-import { SiSimpleanalytics } from "react-icons/si";
 import { GoBookmark } from "react-icons/go";
+import { LuRepeat2 } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
-import { useIsVisible } from "../lib/hooks";
+import { SiSimpleanalytics } from "react-icons/si";
 import { increaseTwittView, likeTwitt } from "../lib/actions";
-import Link from "next/link";
+import { ITwitt, SessionUser } from "../lib/definitions";
+import { useIsVisible } from "../lib/hooks";
 
 const ActionTypes = {
   INCREASE_VIEW: "INCREASE_VIEW",

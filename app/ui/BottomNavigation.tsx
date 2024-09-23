@@ -1,9 +1,7 @@
 "use client";
 
 import React from "react";
-import Logo from "@/app/ui/Logo";
 import { GoHomeFill, GoHome } from "react-icons/go";
-import { PiDotsThreeCircleLight } from "react-icons/pi";
 import { Button } from "@nextui-org/button";
 import { IoIosSearch, } from "react-icons/io";
 import Link from "next/link";

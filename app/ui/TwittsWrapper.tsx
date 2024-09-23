@@ -1,11 +1,10 @@
-import React, { Suspense } from "react";
-import { auth } from "../lib/auth";
-import { getAlltwitts, getTwittComments } from "../lib/db";
-import TwittsList from "./TwittsList";
-import LoadingSpinner from "./LoadingSpinner";
-import CreatePost from "./CreatePost";
 import { Session } from "next-auth";
-import { ITwitt } from "../lib/definitions";
+import { Suspense } from "react";
+import { auth } from "../lib/auth";
+import { getAlltwitts } from "../lib/db";
+import CreatePost from "./CreatePost";
+import LoadingSpinner from "./LoadingSpinner";
+import TwittsList from "./TwittsList";
 
 async function TwittsWrapper() {
   const session = await auth();

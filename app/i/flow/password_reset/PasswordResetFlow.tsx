@@ -44,7 +44,7 @@ function PasswordResetFlow() {
 
   useEffect(() => {
     onOpen();
-  }, [])
+  }, [onOpen])
 
   return (
     <Modal

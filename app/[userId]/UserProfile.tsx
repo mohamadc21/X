@@ -14,7 +14,6 @@ import { SessionUser, User, UserFollowingsAndFollowers } from "../lib/definition
 import { useAppDispatch } from "../lib/hooks";
 import { pusherClient } from "../lib/pusher";
 import { setInfo } from "../lib/slices/userSlice";
-import { profile } from "console";
 
 function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: { children: React.ReactNode, user: User, headerSubtitle: string, follows: UserFollowingsAndFollowers, sessionUser?: SessionUser }) {
   const [profileDetails, setProfileDetails] = useState({ ...user, follows });
