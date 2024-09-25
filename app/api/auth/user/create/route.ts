@@ -8,8 +8,6 @@ export async function POST(request: NextRequest) {
   if (registerType === 'credentials') {
     await signupWithCredentials(data)
   } else {
-    console.log('oAuth data: ');
-    console.log(data);
     await signupWithOAuth(data);
   }
 
