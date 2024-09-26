@@ -9,7 +9,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState, useTransition } from "react";
 import { MdAddAPhoto, MdClose } from "react-icons/md";
-import { updateUserInfo } from "../lib/actions";
+import { updateUserInfo } from "@/app/lib/actions";
 import LoadingSpinner from "./LoadingSpinner";
 import Alert from "./Alert";
 import { useSession } from "next-auth/react";
@@ -18,7 +18,7 @@ type UserInfo = {
   name: string;
   profile: {
     upload: File | null;
-    default: string | null;
+    default: string;
     temp: string | null;
   };
   header_photo: {
@@ -31,7 +31,6 @@ type UserInfo = {
   location: string | null;
   birthday: Date | null;
 }
-
 
 function ProfileEditModal({ user }: { user: User & { twitts: ITwitt[] } }) {
 
@@ -100,6 +99,7 @@ function ProfileEditModal({ user }: { user: User & { twitts: ITwitt[] } }) {
     if (pathname !== `/${user.username}/settings/profile`) onClose();
 
     return () => {
+      onClose();
       setUserInfo(initialUserInfo);
     }
   }, [pathname]);
@@ -131,7 +131,7 @@ function ProfileEditModal({ user }: { user: User & { twitts: ITwitt[] } }) {
           <div className="min-h-[200px] overflow-hidden flex items-center justify-center">
             {userInfo.header_photo.default || userInfo.header_photo.temp ? (
               <div className="min-h-[200px] w-full relative">
-                <Image src={userInfo.header_photo.temp || userInfo.header_photo.default || '/default_white.jpg'} objectFit="cover" fill alt={userInfo.name} priority />
+                <Image src={userInfo.header_photo.temp! || userInfo.header_photo.default!} objectFit="cover" fill alt={userInfo.name} priority />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-5">
                   <Button variant="flat" size="lg" isIconOnly radius="full" onClick={() => headerPhotoUploadRef.current?.click()}>
                     <MdAddAPhoto size={20} />
@@ -151,7 +151,7 @@ function ProfileEditModal({ user }: { user: User & { twitts: ITwitt[] } }) {
           <input type="file" ref={profilePhotoUploadRef} name="profile" onChange={handleUploadChange} hidden accept="image/png, image/jpeg, image/webp" />
           <div className="flex flex-col gap-4 px-[20px]">
             <div className="relative rounded-full -translate-y-14 w-[110px] h-[110px] overflow-hidden">
-              <Image src={userInfo.profile.temp || userInfo.profile.default || '/default_white.jpg'} width={110} height={110} alt={userInfo.name} className="brightness-50" />
+              <Image src={userInfo.profile.temp || userInfo.profile.default} width={110} height={110} alt={userInfo.name} className="brightness-50 h-[110px] w-[110px] object-cover" />
               <Button variant="light" onClick={() => profilePhotoUploadRef.current?.click()} size="lg" isIconOnly radius="full" className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
                 <MdAddAPhoto size={20} />
               </Button>

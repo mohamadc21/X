@@ -36,7 +36,7 @@ export const authConfig: NextAuthConfig = {
         password: {}
       },
       authorize: async (credentials) => {
-        const res = await fetch("${process.env.AUTH_URL}/api/auth/user?email=" + credentials.email);
+        const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=${credentials.email}`);
         if (res.status !== 200) throw new CustomAuthError('email or username not found');;
         const user: User = await res.json();
 
@@ -80,7 +80,7 @@ export const authConfig: NextAuthConfig = {
     },
     jwt: async ({ token, trigger }) => {
       if (!token.user || trigger === 'update') {
-        const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=` + token.email);
+        const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=${token.email}`);
         if (res.status !== 200) return token;
         const data: User = await res.json();
         token = {
@@ -100,7 +100,7 @@ export const authConfig: NextAuthConfig = {
       return session;
     },
     signIn: async ({ user, credentials }) => {
-      const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=` + user.email);
+      const res = await fetch(`${process.env.AUTH_URL}/api/auth/user?email=${user.email}`);
 
       const data: User = await res.json();
       if (!data?.id) {

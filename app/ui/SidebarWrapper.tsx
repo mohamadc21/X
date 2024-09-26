@@ -1,6 +1,8 @@
 import React, { Suspense } from "react";
 import LoadingSpinner from "./LoadingSpinner";
-import Sidebar from "./Sidebar";
+import { auth } from "@/app/lib/auth";
+import BottomNavigation from "./BottomNavigation";
+import Navigation from "./Navigation";
 
 function SidebarWrapper() {
   return (
@@ -11,5 +13,16 @@ function SidebarWrapper() {
     </div>
   )
 }
+
+async function Sidebar() {
+  const session = await auth();
+  return (
+    <>
+      <Navigation user={session?.user!} />
+      <BottomNavigation user={session?.user!} />
+    </>
+  )
+}
+
 
 export default SidebarWrapper;

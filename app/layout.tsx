@@ -4,6 +4,7 @@ import Providers from "@/app/ui/providers/providers";
 import type { Metadata } from "next";
 import { auth } from "./lib/auth";
 import SidebarWrapper from "./ui/SidebarWrapper";
+import NextTopLoader from 'nextjs-toploader';
 
 export const metadata: Metadata = {
   title: {
@@ -29,6 +30,7 @@ export default async function RootLayout({
           <div className="min-h-screen flex flex-col mx-auto xl:max-w-full lg:max-w-[1100px] max-w-3xl pb-4 bg-background text-forground">
             {/* <header></header> */}
             <main className="flex-1 flex flex-col justify-center sm:flex-row">
+              <NextTopLoader zIndex={100} showSpinner={false} />
               {session && <SidebarWrapper />}
               <div className="flex-1 lg:max-w-full w-full max-w-[600px]">
                 {children}

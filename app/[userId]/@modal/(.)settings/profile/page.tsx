@@ -1,7 +1,7 @@
 import React from "react";
 import ProfileEditModal from "@/app/ui/ProfileEditModal";
 import { auth } from "@/app/lib/auth";
-import { getUserById } from "@/app/lib/db";
+import { getUserById } from "@/app/lib/actions";
 
 async function Page() {
   const session = await auth();

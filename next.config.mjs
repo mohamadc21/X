@@ -9,8 +9,7 @@ const nextConfig = {
         hostname: '**',
       }
     ]
-  },
-  output: "standalone"
+  }
 };
 
 export default nextConfig;

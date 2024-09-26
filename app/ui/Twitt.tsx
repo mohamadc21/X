@@ -1,16 +1,18 @@
+import { increaseTwittView, likeTwitt } from "@/app/lib/actions";
+import { ITwitt, SessionUser } from "@/app/lib/definitions";
+import { useAppDispatch, useIsVisible } from "@/app/lib/hooks";
+import { setReplyTo } from "@/app/lib/slices/appSlice";
 import { Button } from "@nextui-org/react";
 import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useOptimistic, useRef, useState } from "react";
 import { FaHeart, FaRegComment, FaRegHeart } from "react-icons/fa";
 import { GoBookmark } from "react-icons/go";
 import { LuRepeat2 } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
 import { SiSimpleanalytics } from "react-icons/si";
-import { increaseTwittView, likeTwitt } from "../lib/actions";
-import { ITwitt, SessionUser } from "../lib/definitions";
-import { useIsVisible } from "../lib/hooks";
 
 const ActionTypes = {
   INCREASE_VIEW: "INCREASE_VIEW",
@@ -22,7 +24,7 @@ type TwittProps = {
   twitt: ITwitt,
   user: SessionUser,
   setTwitts: React.Dispatch<React.SetStateAction<ITwitt[]>>,
-  mediaOnly?: boolean
+  mediaOnly?: boolean,
 }
 
 function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) {
@@ -33,6 +35,8 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
   });
   const twittRef = useRef(null);
   const isVisible = useIsVisible(twittRef);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
 
   async function handleIncreaseView() {
     optimisticDispatch({
@@ -101,6 +105,7 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
     }
   }
 
+
   useEffect(() => {
     if (!isVisible) return;
 
@@ -112,15 +117,17 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
   }, [isVisible]);
 
   return (
-    <div ref={twittRef} className={`${mediaOnly ? '' : 'border-b border-default px-4 py-3'} bg-transparent`}>
+    <div ref={twittRef} className={`${mediaOnly ? '' : 'border-b border-default px-4 py-3'} bg-transparent hover:bg-default/15 transition cursor-pointer`} >
       {mediaOnly ? (
         <div className="w-full h-full">
           <img src={twitt.media!} className="w-full object-cover aspect-square" alt={twitt.text} />
         </div>
       ) : (
-        <div className="grid gap-2" style={{ gridTemplateColumns: '45px 1fr' }}>
-          <Image width={45} height={45} className="sm:block hidden rounded-full flex-shrink-0 w-[45px] h-[45px]" src={twitt.user_profile || '/default_white.jpg'} alt={twitt.name!} />
-          <Image width={37} height={37} className="sm:hidden block rounded-full flex-shrink-0 w-[37px] h-[37px]" src={twitt.user_profile || '/default_white.jpg'} alt={twitt.name!} />
+        <div className="grid gap-4" style={{ gridTemplateColumns: '45px 1fr' }}>
+          <div className="relative w-[45px] h-[45px]">
+            <Image fill className="sm:block hidden rounded-full flex-shrink-0 object-cover" src={twitt.user_profile} alt={twitt.name!} />
+            <Image fill className="sm:hidden block rounded-full flex-shrink-0 object-cover" src={twitt.user_profile} alt={twitt.name!} />
+          </div>
           <div className="flex flex-col gap-3 sm:ml-0 -ml-[7px]">
             <div>
               <div className="flex items-start gap-4 whitespace-nowrap">
@@ -164,7 +171,10 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
               )}
             </div>
             <div className="flex items-center gap-4 justify-between -ml-2">
-              <Button variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0">
+              <Button onClick={() => {
+                dispatch(setReplyTo(twitt));
+                router.push('/post');
+              }} variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0">
                 <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
                   <FaRegComment size={17} className="relative" />
                 </div>

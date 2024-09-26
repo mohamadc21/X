@@ -1,69 +1,39 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Twitt from "./Twitt";
-import { ITwitt } from "../lib/definitions";
+import { ITwitt } from "@/app/lib/definitions";
+import { setTwitts as setTwittsSlice } from '@/app/lib/slices/appSlice';
 import { Session } from "next-auth";
-import { pusherClient } from "../lib/pusher";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import useSWR from "swr";
+import Twitt from "./Twitt";
 
 type TwittsListProps = {
   session: Session | null,
   allTwitts: ITwitt[],
-  mediaOnly?: boolean
+  mediaOnly?: boolean,
+  userId?: number | string,
+  type: 'without_replies' | 'with_replies'
 }
 
-function TwittsList({ session, allTwitts, mediaOnly = false }: TwittsListProps) {
+function TwittsList({ session, allTwitts, mediaOnly = false, userId, type }: TwittsListProps) {
   const [twitts, setTwitts] = useState(allTwitts);
+  const dispatch = useDispatch();
+  useSWR<ITwitt[]>(`${userId ? '/api/user/twitts' : '/api/twitts'}`, async () => {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/${userId ? `user/twitts?id=${userId}${type === 'without_replies' ? '&include_replies=false' : ''}` : `twitts${type === 'without_replies' ? '?include_replies=false' : ''}`}`);
+    const data = await resp.json();
+    setTwitts(data);
+    return data;
+  }, {
+    refreshInterval: 5000,
+  });
 
   useEffect(() => {
-    const twittsChannel = pusherClient.subscribe('twitts');
-
-    twittsChannel.bind('lastTwitt', (data: ITwitt) => {
-      setTwitts(prev => [data, ...prev]);
-    });
-
-    twittsChannel.bind('views', (data: { id: number | string, user_id: number | string }) => {
-      const updatedTwitts = twitts.map(twitt => {
-        if (twitt.id === data.id) {
-          twitt = {
-            ...twitt,
-            views: [...twitt.views, data.user_id as number]
-          }
-        }
-        return twitt;
-      })
-      setTwitts(updatedTwitts);
-    })
-
-    twittsChannel.bind('likes', (data: { id: number | string, user_id: number | string, isLiked: boolean }) => {
-      setTwitts(() => twitts.map(twitt => {
-        if (twitt.id === data.id as number) {
-          const hasUserOptimisticallyLiked = twitt.likes.some(like => like == data.user_id);
-
-          if (data.isLiked && !hasUserOptimisticallyLiked) {
-            twitt = {
-              ...twitt,
-              likes: [...twitt.likes, data.user_id]
-            }
-          } else if (!data.isLiked && hasUserOptimisticallyLiked) {
-            twitt = {
-              ...twitt,
-              likes: twitt.likes.filter(like => like != data.user_id)
-            }
-          }
-        }
-        return twitt;
-      }))
-    });
-
-    return () => {
-      twittsChannel.unbind();
+    if (twitts) {
+      dispatch(setTwittsSlice(twitts));
     }
   }, [twitts]);
 
-  useEffect(() => {
-    setTwitts(allTwitts);
-  }, [allTwitts]);
   const groupedTwitts = [];
   for (let i = 0; i < twitts.length; i += 3) {
     groupedTwitts.push(twitts.slice(i, i + 3));
@@ -92,7 +62,7 @@ function TwittsList({ session, allTwitts, mediaOnly = false }: TwittsListProps) 
         </>
       ) : (
         <>
-          {twitts?.map((twitt, idx) => (
+          {twitts?.map(twitt => (
             <Twitt
               user={session?.user!}
               key={twitt.id}

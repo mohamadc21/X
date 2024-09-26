@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get('id') || request.nextUrl.searchParams.get('email');
   if (!id) return NextResponse.json({ message: 'id or email needed' }, { status: 400 });
-  const data = await query<User>("select * from users where id = ? or email = ?", [id, id]);
+  const data = await query<User[]>("select * from users where id = ? or email = ?", [id, id]);
 
   if (!data.length) {
     return NextResponse.json({

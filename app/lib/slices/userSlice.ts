@@ -12,14 +12,15 @@ export type LoginSlice = {
 }
 
 export interface UserSlice {
-  info: User &  { follows?: UserFollowingsAndFollowers } | null
+  info: User & { follows?: UserFollowingsAndFollowers, created_at: string, updated_at: string } | null
   twitts: ITwitt[] | null
 }
 
 interface UserState {
   signup: SignupSlice
   login: LoginSlice,
-  user: UserSlice
+  user: UserSlice,
+  replyTo: ITwitt | null
 }
 
 const initialState: UserState = {
@@ -34,7 +35,8 @@ const initialState: UserState = {
   user: {
     info: null,
     twitts: null
-  }
+  },
+  replyTo: null
 }
 
 const userSlice = createSlice({
@@ -50,15 +52,12 @@ const userSlice = createSlice({
     setInfo(state, action: PayloadAction<UserSlice['info']>) {
       state.user.info = action.payload;
     },
-    setTwitts(state, action: PayloadAction<ITwitt[]>) {
-      state.user.twitts = action.payload;
-    },
     setUserData(state, action: PayloadAction<UserSlice>) {
       state.user = action.payload;
     },
   }
 })
 
-export const { setLoginData, setSignupData, setInfo, setUserData, setTwitts } = userSlice.actions;
+export const { setLoginData, setSignupData, setInfo, setUserData } = userSlice.actions;
 
 export default userSlice.reducer;

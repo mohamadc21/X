@@ -6,17 +6,72 @@ import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { storage } from "./appwrite";
 import { signIn } from "./auth";
-import { getAlltwitts, getUserFollowersAndFollowings, query } from "./db";
-import { ActionError, AddTwitt, ITwitt, PasswordData, SignupData, Verification } from "./definitions";
-import { pusherServer } from "./pusher";
+import { query } from "./db";
+import { ActionError, AddTwitt, ITwitt, PasswordData, SignupData, User, UserFollowingsAndFollowers, UserFollowingsAndFollowersTable, Verification } from "./definitions";
 import { sendMail } from "./sendMail";
+import { ResultSetHeader } from "mysql2";
 
 interface CredentialsData extends SignupData, PasswordData { }
+
 interface OAuthData {
   name: string,
   email: string,
   image: string,
   password: null
+}
+
+export async function getAlltwitts({ byUsername = false, username, with_reply = false }: { byUsername?: boolean, username?: string, with_reply?: boolean } = {}): Promise<ITwitt[]> {
+  const condition = `${byUsername && username ? 'where users.username = ?' : ''} ${!with_reply ? 'and reply_to is null' : ''}`;
+  const params: any[] = [];
+
+  if (byUsername) {
+    params.push(username);
+  }
+
+  const allTwitts = await query<ITwitt[]>(`select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id ${condition} order by twitts.id desc`, params);
+
+  return allTwitts;
+}
+
+export async function getTwittComments(twitt_id: number | string) {
+  const comments = await query<ITwitt[]>("select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where reply_to = ? order by twitts.id desc", [twitt_id]);
+
+  return comments;
+}
+
+export async function getUserByUsername(username: string, twittsWithReply: boolean = false): Promise<(User & { twitts: ITwitt[] }) | null> {
+  const result = await query<User[]>("select * from users where username = ?", [username]);
+
+  if (result.length < 1) return null;
+  const userTwitts = await getAlltwitts({ byUsername: true, username, with_reply: twittsWithReply });
+
+  return {
+    ...result[0],
+    twitts: userTwitts
+  };
+}
+
+export async function getUserById(id: number | string, twittsWithReply: boolean = false): Promise<(User & { twitts: ITwitt[] }) | null> {
+  const result = await query<User[]>("select * from users where id = ?", [id]);
+
+  if (result.length < 1) return null;
+  const userTwitts = await getAlltwitts({ byUsername: true, username: result[0].username!, with_reply: twittsWithReply });
+
+  return {
+    ...result[0],
+    twitts: userTwitts
+  };
+}
+
+export async function getUserFollowersAndFollowings(user_id: number | string): Promise<UserFollowingsAndFollowers> {
+  const result = await query<UserFollowingsAndFollowersTable[]>("select * from follows where following_id = ? or follower_id = ?", [user_id, user_id]);
+
+  const followers = result.filter(follow => follow.following_id == user_id).map(follow => follow.follower_id);
+  const followings = result.filter(follow => follow.follower_id == user_id).map(follow => follow.following_id);
+  return {
+    followers: followers,
+    followings: followings
+  };
 }
 
 export async function signinWithGoogle() {
@@ -26,7 +81,7 @@ export async function signinWithGoogle() {
 }
 
 export async function checkExistsEmail(email: string): Promise<boolean> {
-  const result = await query<{ total_users: number }>("select count(*) as total_users from users where email=?", [email]);
+  const result = await query<{ total_users: number }[]>("select count(*) as total_users from users where email=?", [email]);
   return result[0].total_users > 0;
 }
 
@@ -64,7 +119,7 @@ export async function sendVerification(email: string) {
         `
     });
 
-    const oldVerification = await query<{ total_verifications: number }>("select count(*) as total_verifications from verifications where email=?", [email]);
+    const oldVerification = await query<{ total_verifications: number }[]>("select count(*) as total_verifications from verifications where email=?", [email]);
     let result;
     if (oldVerification[0].total_verifications > 0) {
       result = await query("update verifications set code=?,expires_at=?", [code, expiresAt.toISOString()]);
@@ -109,7 +164,7 @@ export async function sendPasswordResetVerification(email: string) {
         `
     });
 
-    const oldVerification = await query<{ total_verifications: number }>("select count(*) as total_verifications from verifications where email=?", [email]);
+    const oldVerification = await query<{ total_verifications: number }[]>("select count(*) as total_verifications from verifications where email=?", [email]);
     let result;
     if (oldVerification[0].total_verifications > 0) {
       result = await query("update verifications set code=?,expires_at=?", [code, expiresAt.toISOString()]);
@@ -123,7 +178,7 @@ export async function sendPasswordResetVerification(email: string) {
 }
 
 export async function checkVerificationCode(email: string, code: string | number): Promise<ActionError> {
-  const result = await query<Verification>("select * from verifications where email=? and code=?", [email, code]);
+  const result = await query<Verification[]>("select * from verifications where email=? and code=?", [email, code]);
 
   if (result.length < 1) return { message: 'verification is not correct' }
 
@@ -295,7 +350,7 @@ export async function uploadTwittImage(formData: FormData): Promise<any> {
 }
 
 export async function usernameIsUnique(username: string): Promise<boolean> {
-  const result = await query<{ total_usernames: number }>("select count(*) as total_usernames from users where username=?", [username]);
+  const result = await query<{ total_usernames: number }[]>("select count(*) as total_usernames from users where username=?", [username]);
   return result[0].total_usernames < 1;
 }
 
@@ -316,7 +371,7 @@ export async function updateUsername(username: string, email: string): Promise<A
 }
 
 export async function checkExistsUserByEmailUsername(value: string, giveEmail: boolean = false): Promise<any> {
-  const res = await query<{ email: string }>("select email from users where email = ? or username = ?", [value, value]);
+  const res = await query<{ email: string }[]>("select email from users where email = ? or username = ?", [value, value]);
   if (giveEmail) {
     return {
       exists: Boolean(res.length > 0),
@@ -337,7 +392,7 @@ export async function changePassword(email: string, password: string): Promise<A
   }
 }
 
-export async function addTwitt({ userId, text, formData, gif }: AddTwitt): Promise<ActionError> {
+export async function addTwitt({ userId, text, formData, gif, replyTo }: AddTwitt): Promise<ActionError> {
   let fields = 'user_id, text, comments, likes, retwitts, views';
   let values = '?,?,?,?,?,?';
   let params = [userId, text, '[]', '[]', '[]', `[${userId}]`];
@@ -362,17 +417,27 @@ export async function addTwitt({ userId, text, formData, gif }: AddTwitt): Promi
     params.push(gif, 'gif');
   }
 
+  if (replyTo) {
+    fields += ', reply_to';
+    values += ',?';
+    params.push(replyTo);
+  }
+
   try {
-    await query(`insert into twitts (${fields}) values (${values})`, params);
-    await triggerTwitts();
+    await Promise.all([
+      query<ResultSetHeader>(`insert into twitts (${fields}) values (${values})`, params),
+      replyTo ? query("update twitts set comments = json_array_append(comments, '$', ?) where id = ?", [replyTo?.toString(), replyTo]) : null
+    ]
+    );
   } catch (err) {
+    console.error(err);
     return { message: 'an error occurred' }
   }
 }
 
 export async function increaseTwittView(twitt_id: number | string, user_id: number | string) {
 
-  const result = await query<{ views: number[] }>("select views from twitts where id = ?", [twitt_id]);
+  const result = await query<{ views: number[] }[]>("select views from twitts where id = ?", [twitt_id]);
 
   const views = result[0].views;
 
@@ -380,46 +445,28 @@ export async function increaseTwittView(twitt_id: number | string, user_id: numb
 
   if (alreadyViewed) return;
 
-  await query("update twitts set views = json_array_append(views, '$', ?) where id = ?", [user_id, twitt_id]);
-  await pusherServer.trigger('twitts', `views`, {
-    id: twitt_id,
-    user_id
-  });
+  await Promise.all([
+    query("update twitts set views = json_array_append(views, '$', ?) where id = ?", [user_id, <string>twitt_id])
+  ]);
 }
 
 export async function likeTwitt({ twitt_id, user_id }: { twitt_id: number | string, user_id: number | string }) {
-  const result = await query<{ likes: number[] }>("select likes from twitts where id = ? and json_contains(likes, ?)", [twitt_id, `"${user_id}"`]);
+  const result = await query<{ likes: number[] }[]>("select likes from twitts where id = ? and json_contains(likes, ?)", [twitt_id, `"${user_id}"`]);
 
   if (!result.length) {
-    await query("update twitts set likes = json_array_append(likes, '$', ?) where id = ?", [user_id, twitt_id])
-    await pusherServer.trigger('twitts', 'likes', {
-      id: twitt_id,
-      user_id,
-      isLiked: true
-    });
+    await Promise.all([
+      query("update twitts set likes = json_array_append(likes, '$', ?) where id = ?", [user_id, twitt_id])
+    ]);
   } else {
     const likes = result[0].likes.filter(like => like != user_id);
-    await query("update twitts set likes = ? where id = ?", [likes, twitt_id]);
-    await pusherServer.trigger('twitts', 'likes', {
-      id: twitt_id,
-      user_id,
-      isLiked: false
-    });
-  }
-
-}
-
-export async function triggerTwitts() {
-  try {
-    const twitts = await getAlltwitts();
-    await pusherServer.trigger('twitts', 'lastTwitt', twitts[0]);
-  } catch (err) {
-    console.error(err);
+    await Promise.all([
+      query("update twitts set likes = ? where id = ?", [likes, twitt_id])
+    ]);
   }
 }
 
 export async function follow(follower_id: number | string, following_id: number | string) {
-  const exists = await query("select id from follows where follower_id = ? and following_id = ?", [follower_id, following_id]);
+  const exists = await query<{ id: number }[]>("select id from follows where follower_id = ? and following_id = ?", [follower_id, following_id]);
   if (exists.length > 0) return;
 
   await query("insert into follows (follower_id, following_id) values (?,?)", [
@@ -427,19 +474,10 @@ export async function follow(follower_id: number | string, following_id: number 
     following_id
   ]);
 
-  const userFollows = await getUserFollowersAndFollowings(following_id);
-  await pusherServer.trigger('profile', 'follows', {
-    follows: userFollows,
-  });
 }
 
 export async function unFollow(follower_id: number | string, following_id: number | string) {
   await query("delete from follows where follower_id = ? and following_id = ?", [follower_id, following_id]);
-
-  const userFollows = await getUserFollowersAndFollowings(following_id);
-  await pusherServer.trigger("profile", "follows", {
-    follows: userFollows
-  });
 }
 
 export async function updateUserInfo(formData: FormData): Promise<ActionError> {
@@ -454,26 +492,27 @@ export async function updateUserInfo(formData: FormData): Promise<ActionError> {
 
   let updateQuery = "update users set name=?, bio=?, website=?, location=? where email = ?";
   const params = [name, bio, website, location, email];
+  const promises: Promise<any>[] = [];
+  const headerPhotoFormData = new FormData();
+  const profilePhotoFormData = new FormData();
+
+  promises.push(query(updateQuery, params));
 
   if (header_photo_upload) {
-    const formData = new FormData();
-    formData.append('upload', header_photo_upload);
-    formData.append('email', email);
-    const error = await uploadHeaderPhoto(formData);
-    if (error) return error;
+    headerPhotoFormData.append('upload', header_photo_upload);
+    headerPhotoFormData.append('email', email);
+    promises.push(uploadHeaderPhoto(headerPhotoFormData));
   }
 
   if (profile_photo_upload) {
-    const formData = new FormData();
-    formData.append('upload', profile_photo_upload);
-    formData.append('email', email);
-    const error = await uploadProfile(formData);
-    if (error) return error;
+    profilePhotoFormData.append('upload', profile_photo_upload);
+    profilePhotoFormData.append('email', email);
+    promises.push(uploadProfile(profilePhotoFormData));
   }
 
   try {
-    await query(updateQuery, params);
-    revalidatePath(`/${username}`);
+    await Promise.all(promises);
+    revalidatePath('/', 'layout');
   } catch (err) {
     console.error(err);
     return { message: "an error occurred" };
@@ -482,6 +521,6 @@ export async function updateUserInfo(formData: FormData): Promise<ActionError> {
 }
 
 export async function getUserTwittsByMedia(user_id: number | string) {
-  const twitts = await query<ITwitt>(`select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where users.id = ? or users.username = ? and not media is null order by twitts.id desc`, [user_id, user_id]);
+  const twitts = await query<ITwitt[]>(`select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where users.id = ? or users.username = ? and not media is null order by twitts.id desc`, [user_id, user_id]);
   return twitts;
 }

@@ -7,7 +7,7 @@ import { Button } from "@nextui-org/button";
 
 function Header({ user }: { user: Session['user'] }) {
   return (
-    <header className="sm:hidden sticky top-0 left-0 w-full flex items-center py-3 px-4 border-b border-default bg-background">
+    <header className="sm:hidden sticky top-0 left-0 w-full flex items-center py-3 px-4 border-b border-default bg-background z-[3]">
       <div className="flex items-center justify-between w-full">
         <Button className="rounded-full w-[30px] h-[30px] min-w-0 p-0" isIconOnly>
           <Image

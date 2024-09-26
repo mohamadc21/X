@@ -10,10 +10,10 @@ import { BiSolidUser, BiUser } from "react-icons/bi";
 import { IoNotifications, IoNotificationsOutline } from "react-icons/io5";
 import { IoMail, IoMailOutline } from "react-icons/io5";
 import { Badge } from "@nextui-org/react";
-import { Session } from "next-auth";
+import { SessionUser } from "../lib/definitions";
 
 
-function BottomNavigation({ session }: { session: Session }) {
+function BottomNavigation({ user }: { user: SessionUser }) {
   const pathname = usePathname();
   const links = [
     {
@@ -50,7 +50,7 @@ function BottomNavigation({ session }: { session: Session }) {
       },
     },
     {
-      href: `/${session.user.username}`,
+      href: `/${user.username}`,
       text: 'Profile',
       logo: {
         outline: <BiUser size={25} />,

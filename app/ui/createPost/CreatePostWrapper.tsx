@@ -1,13 +1,13 @@
 import React from "react";
-import CreatePost from "@/app/ui/CreatePost";
-import { auth } from "../lib/auth";
+import CreatePost from "@/app/ui/createPost/CreatePost";
+import { auth } from "../../lib/auth";
 
 async function CreatePostWrapper() {
   const session = await auth();
   if (!session?.user) return;
   return (
     <CreatePost
-      user={session?.user}
+      user={session.user}
       asModal
     />
   )

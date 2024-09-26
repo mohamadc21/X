@@ -9,11 +9,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
-import { follow, unFollow } from "../lib/actions";
-import { SessionUser, User, UserFollowingsAndFollowers } from "../lib/definitions";
-import { useAppDispatch } from "../lib/hooks";
-import { pusherClient } from "../lib/pusher";
-import { setInfo } from "../lib/slices/userSlice";
+import { follow, unFollow } from "@/app/lib/actions";
+import { SessionUser, User, UserFollowingsAndFollowers } from "@/app/lib/definitions";
+import { useAppDispatch } from "@/app/lib/hooks";
+import { FaLocationDot } from "react-icons/fa6";
+import { setInfo } from "@/app/lib/slices/userSlice";
+import { GrAttachment } from "react-icons/gr";
+import useSWR from "swr";
 
 function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: { children: React.ReactNode, user: User, headerSubtitle: string, follows: UserFollowingsAndFollowers, sessionUser?: SessionUser }) {
   const [profileDetails, setProfileDetails] = useState({ ...user, follows });
@@ -26,6 +28,14 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: {
     if (pathname === `/${user.username}/media`) return 'media';
   });
   const dispatch = useAppDispatch();
+  useSWR<User & { follows: UserFollowingsAndFollowers }>(`/api/user/details`, async () => {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
+    const data = await resp.json();
+    setProfileDetails(data);
+    return data;
+  }, {
+    refreshInterval: 10000
+  });
 
   async function handleLike() {
     setProfileDetails(prev => ({ ...prev, follows: { ...follows, followers: [...prev.follows.followers, sessionUser?.id! as unknown as number] } }));
@@ -38,25 +48,12 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: {
   }
 
   useEffect(() => {
-    const profileChannel = pusherClient.subscribe('profile');
-    profileChannel.bind('follows', (data: { follows: UserFollowingsAndFollowers }) => {
-      if (profileDetails.follows.followers.length === follows.followers.length) return;
-      setProfileDetails(prev => ({ ...prev, follows: data.follows }));
-    });
-
+    setProfileDetails({ ...user, follows });
     dispatch(setInfo({
       ...user,
-      created_at: user.created_at as string,
-      updated_at: user.updated_at as string,
+      created_at: user.created_at.toLocaleString() as string,
+      updated_at: user.updated_at.toLocaleString() as string,
     }));
-
-    return () => {
-      profileChannel.unbind();
-    }
-  }, []);
-
-  useEffect(() => {
-    setProfileDetails({ ...user, follows })
   }, [user, follows]);
 
   useEffect(() => {
@@ -85,9 +82,9 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: {
           <div className="h-[200px] bg-default-200" />
         )}
         <div className="px-4 flex justify-between mb-3">
-          <div className="flex flex-col gap-3">
-            <Card isPressable className="h-[140px] w-[140px] min-w-max rounded-full border-4 border-background -mt-[28%]" onClick={() => router.push(`/${user.username}/photo`)}>
-              <Image width={140} priority={true} height={140} src={profileDetails.profile || '/default_white.jpg'} alt={profileDetails.name} />
+          <div className="flex flex-col -mt-[12%] gap-3">
+            <Card isPressable className="h-[140px] w-[140px] min-w-max rounded-full border-4 border-background relative" onClick={() => router.push(`/${user.username}/photo`)}>
+              <Image fill src={profileDetails.profile || '/default_white.jpg'} className="object-cover" alt={profileDetails.name} />
             </Card>
             <div>
               <h1 className="text-xl font-bold">{profileDetails.name}</h1>
@@ -96,9 +93,23 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: {
             {profileDetails.bio && (
               <p>{profileDetails.bio}</p>
             )}
-            <div className="flex items-center gap-2 text-default-400">
-              <FaRegCalendarAlt size={15} />
-              <span>Joined {format(profileDetails.created_at, "MMMM yyyy")}</span>
+            <div className="flex items-center gap-4 flex-wrap">
+              {profileDetails.location && (
+                <div className="flex items-center gap-1 text-default-400">
+                  <FaLocationDot size={15} />
+                  <span>{profileDetails.location}</span>
+                </div>
+              )}
+              {profileDetails.website && (
+                <div className="flex items-center gap-1 text-default-400">
+                  <GrAttachment size={15} />
+                  <Link href={profileDetails.website}>{profileDetails.website}</Link>
+                </div>
+              )}
+              <div className="flex items-center gap-1 text-default-400">
+                <FaRegCalendarAlt size={15} />
+                <span>Joined {format(profileDetails.created_at, "MMMM yyyy")}</span>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <p className="text-default-400"><span className="text-foreground">{profileDetails.follows.followings.length}</span> Following</p>

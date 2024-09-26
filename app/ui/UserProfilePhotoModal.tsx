@@ -15,8 +15,6 @@ function UserProfilePhotoModal({ mode }: { mode: 'profile' | 'header' }) {
 
   useEffect(() => {
     onOpen();
-    // if (pathname !== `/${userInfo?.username}/${mode}`) onClose();
-    // console.log(`/${userInfo?.username}/${mode}`);
   }, [pathname]);
 
   return (

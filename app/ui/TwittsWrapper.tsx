@@ -1,10 +1,12 @@
 import { Session } from "next-auth";
 import { Suspense } from "react";
-import { auth } from "../lib/auth";
-import { getAlltwitts } from "../lib/db";
-import CreatePost from "./CreatePost";
+import { auth } from "@/app/lib/auth";
+import { getAlltwitts } from "@/app/lib/actions";
+import CreatePost from "@/app/ui/createPost/CreatePost";
 import LoadingSpinner from "./LoadingSpinner";
 import TwittsList from "./TwittsList";
+
+export const revalidate = 0;
 
 async function TwittsWrapper() {
   const session = await auth();

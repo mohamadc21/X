@@ -13,7 +13,9 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";
 import { LuImage } from "react-icons/lu";
 import { MdGif } from "react-icons/md";
-import { useModalProps } from "../lib/hooks";
+import { useAppSelector, useModalProps } from "@/app/lib/hooks";
+import { format } from "date-fns";
+import { useSWRConfig } from "swr";
 
 const options = [
   {
@@ -60,9 +62,9 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
   const [isOpenEmojiPanel, setIsOpenEmojiPanel] = useState(false);
   const modalProps = useModalProps;
   const router = useRouter();
-
+  const { mutate } = useSWRConfig();
+  const replyTo = useAppSelector(state => state.app.replyTo);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   function handleAddTwitt() {
@@ -77,7 +79,9 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
         twittData.formData = formData;
       }
       if (gif) twittData.gif = gif;
+      if (replyTo) twittData.replyTo = replyTo.id;
       await addTwitt(twittData);
+      mutate('/api/twitts');
       setText('');
       setFullText('');
       setGif('');
@@ -140,7 +144,7 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
       setGifs([]);
       setSearch('');
     }
-  }, [gf]);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -172,21 +176,51 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
       {asModal ? (
         <>
           <ModalBody>
+            {replyTo && (
+              <div className="grid gap-2 mb-4" style={{ gridTemplateColumns: '45px 1fr' }}>
+                <div>
+                  <Image width={45} height={45} className="sm:block hidden rounded-full flex-shrink-0 w-[45px] h-[45px]" src={replyTo.user_profile || '/default_white.jpg'} alt={replyTo.name!} />
+                  <Image width={37} height={37} className="sm:hidden block rounded-full flex-shrink-0 w-[37px] h-[37px]" src={replyTo.user_profile || '/default_white.jpg'} alt={replyTo.name!} />
+                  <div className="h-[60%] w-0.5 bg-default-100 mx-auto" />
+                </div>
+                <div className="flex flex-col gap-3 sm:ml-0 -ml-[7px]">
+                  <div>
+                    <div className="flex items-start gap-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1 truncate overflow-hidden">
+                        <p className="font-bold max-[400px]:text-[15px] text-foreground">{replyTo.name}</p>
+                        <p className="text-default-400 overflow-hidden max-[400px]:text-[13px]">@{replyTo.username}</p>
+                      </div>
+                      <p className="text-default-400">-</p>
+                      <p className="text-default-400">{format(new Date(replyTo.created_at).toISOString(), 'MMM d')}</p>
+                    </div>
+                    {replyTo.text && (
+                      <p
+                        className="whitespace-pre-wrap leading-5 break-words"
+                        dangerouslySetInnerHTML={{ __html: replyTo.text }}
+                      />
+                    )}
+                    <div className="mt-4 text-default-400">
+                      <p>Replying to <span className="text-primary">@{replyTo.username}</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="flex gap-1">
               <Image
                 width={44}
                 height={44}
                 priority={true}
-                src={user?.image || '/default_white.jpg'}
-                alt={user.name!}
-                className="flex-shrink-0 w-11 h-11 rounded-full"
+                src={user.image}
+                alt={user.name}
+                className="flex-shrink-0 w-11 h-11 rounded-full object-cover"
               />
               <div className="w-full relative">
                 <div className="relative">
                   <Textarea
                     variant="bordered"
                     size="lg"
-                    placeholder="What&apos;s happening?!"
+                    placeholder={`${replyTo ? 'Post your reply' : 'What\'s happening?!'}`}
                     classNames={{
                       input: "text-xl max-[380px]:text-lg placeholder:text-default-400",
                       inputWrapper: "border-none",
@@ -254,21 +288,22 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                 hidden
               />
             </div>
-            <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">Post</Button>
+            <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">{replyTo ? 'Reply' : 'Post'}</Button>
 
           </ModalFooter>
         </>
       ) : (
         <div className="px-4">
           <div className="flex gap-1">
-            <Image
-              width={44}
-              height={44}
-              priority={true}
-              src={user?.image || '/default_white.jpg'}
-              alt={user.name!}
-              className="flex-shrink-0 w-11 h-11 rounded-full"
-            />
+            <div className="relative w-[44px] h-[44px] flex-shrink-0">
+              <Image
+                fill
+                priority={true}
+                src={user.image}
+                alt={user.name}
+                className="w-[44px] h-[44px] rounded-full object-cover"
+              />
+            </div>
             <div className="w-full relative">
               <div className="relative">
                 <Textarea
@@ -321,8 +356,7 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                     hidden
                   />
                 </div>
-                <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">Post</Button>
-
+                <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">{replyTo ? 'Reply' : 'Post'}</Button>
               </div>
               {mounted && (
                 <div className="absolute top-full" ref={emojiPickerRef}>
@@ -383,13 +417,6 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                     <img src={gif.images.original.url} className="object-contain" alt="gif" />
                   </button>
                 ))
-                //                 <Grid
-                //                   width={800}
-                //                   columns={3}
-                //                   fetchGifs={gifs}
-                //                   noLink
-                //                   onGifClick={(e) => console.log(e)}
-                //                 />
               )}
             </div>
           </ModalBody>

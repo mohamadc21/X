@@ -1,14 +1,14 @@
 import React, { Suspense } from "react";
-import PostModal from "./PostModal";
-import CreatePostWrapper from "./CreatePostWrapper";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import PostModal from "@/app/ui/createPost/PostModal";
+import CreatePostWrapper from "@/app/ui/createPost/CreatePostWrapper";
+import LoadingSpinner from "@/app/ui/LoadingSpinner";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: 'Create post'
 }
 
-async function Page() {
+function Page() {
   return (
     <PostModal>
       <Suspense fallback={<LoadingSpinner />}>

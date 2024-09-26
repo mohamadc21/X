@@ -1,5 +1,5 @@
 import { auth } from "@/app/lib/auth";
-import { getUserByUsername } from "@/app/lib/db";
+import { getUserByUsername } from "@/app/lib/actions";
 import TwittsList from "@/app/ui/TwittsList";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -17,10 +17,9 @@ async function Page({ params }: { params: { userId: string } }) {
     auth()
   ]);
   if (!user) notFound();
-  const twittsWithoutReply = user.twitts.filter(twitt => twitt.reply_to === null);
 
   return (
-    <TwittsList session={session} allTwitts={twittsWithoutReply} />
+    <TwittsList session={session} allTwitts={user.twitts} userId={user.id} type="without_replies" />
   )
 }
 

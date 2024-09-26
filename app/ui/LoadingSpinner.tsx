@@ -3,7 +3,7 @@ function LoadingSpinner({ wrapperClassName, noPadding = false, className, color,
 
   let spinnerSize = 'w-7 h-7';
   if (size === 'sm') spinnerSize = 'w-5 h-5';
-  let spinnerType = `${noPadding ? '' : (size === 'sm' ? '' : 'p-3')} w-full h-full flex items-center justify-center`;
+  let spinnerType = `${noPadding ? '' : (size === 'sm' ? '' : 'p-3')} w-full min-h-full flex items-center justify-center`;
   if (type === 'fullscreen') spinnerType = 'fixed inset-0 flex p-3 w-full bg-background items-center justify-center';
 
   return (

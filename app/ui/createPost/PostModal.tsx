@@ -1,33 +1,35 @@
 "use client";
 
-import { useModalProps } from "@/app/lib/hooks";
+import { useAppDispatch, useModalProps } from "@/app/lib/hooks";
+import { setReplyTo } from "@/app/lib/slices/appSlice";
 import { Modal, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/modal";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 
 function PostModal({ children }: { children: React.ReactNode }) {
-  const [isMounted, setIsMounted] = useState(false);
-  const { onOpenChange, onOpen, isOpen } = useDisclosure();
+  const { onOpen, isOpen, onClose } = useDisclosure();
   const router = useRouter();
   const modalProps = useModalProps;
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    setIsMounted(true);
-    if (!isOpen) onOpen();
-  }, [isOpen, onOpen])
-
-  useEffect(() => {
-    if (isMounted) {
-      if (!isOpen) router.back();
-    }
-  }, [onOpenChange, isMounted, isOpen, router]);
+    onOpen();
+  }, [])
 
   return (
     <Modal
       isOpen={isOpen}
-      onOpenChange={onOpenChange}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          onClose();
+          router.back();
+        }
+      }}
       {...modalProps({ size: "xl" })}
+      onClose={() => {
+        dispatch(setReplyTo(null));
+      }}
       placement="top"
     >
       <ModalContent>

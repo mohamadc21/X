@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Logo from "@/app/ui/Logo";
 import { GoHomeFill, GoHome } from "react-icons/go";
 import { PiDotsThreeCircleLight } from "react-icons/pi";
@@ -12,11 +12,10 @@ import { BiSolidUser, BiUser } from "react-icons/bi";
 import { IoNotifications, IoNotificationsOutline } from "react-icons/io5";
 import { IoMail, IoMailOutline } from "react-icons/io5";
 import { Badge } from "@nextui-org/react";
-import { Session } from "next-auth";
 import Image from "next/image";
+import { SessionUser } from "../lib/definitions";
 
-function Navigation({ session }: { session: Session }) {
-  const [isMounted, setIsMounted] = useState(false);
+function Navigation({ user }: { user: SessionUser }) {
   const pathname = usePathname();
 
   const links = [
@@ -54,7 +53,7 @@ function Navigation({ session }: { session: Session }) {
       },
     },
     {
-      href: `/${session.user.username}`,
+      href: `/${user.username}`,
       text: 'Profile',
       logo: {
         outline: <BiUser size={30} />,
@@ -71,12 +70,6 @@ function Navigation({ session }: { session: Session }) {
     },
   ]
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) return null;
-
   return (
     <>
       <ul className="hidden sm:flex flex-col xl:items-stretch items-center gap-2 w-full max-w-[235px]">
@@ -91,25 +84,25 @@ function Navigation({ session }: { session: Session }) {
               <>
                 <Button as={link?.href ? Link : "button"} href={link?.href || undefined} variant="light" size="lg" className="xl:flex hidden w-full hover:no-underline px-3 min-w-max items-center justify-start gap-4 text-xl" radius="full">
                   <Badge content="" size="sm" color="primary">
-                    {pathname === link.href ? link.logo.filled : link.logo.outline}
+                    {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
                   </Badge>
                   <span className={`xl:block hidden ${pathname === link.href ? 'font-bold' : ''}`}>{link?.text}</span>
                 </Button>
                 <Button variant="light" as={link?.href ? Link : "button"} href={link?.href || undefined} size="lg" isIconOnly className="xl:hidden flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" radius="full">
                   <Badge content="" size="sm" color="primary">
-                    {pathname === link.href ? link.logo.filled : link.logo.outline}
+                    {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
                   </Badge>
                 </Button>
               </>
             ) : (
               <>
                 <Button variant="light" as={link?.href ? Link : "button"} href={link?.href || undefined} size="lg" className="xl:flex hidden w-full hover:no-underline px-3 min-w-max items-center justify-start gap-4 text-xl" radius="full">
-                  {pathname === link.href ? link.logo.filled : link.logo.outline}
+                  {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
                   <span className={`xl:block hidden ${pathname === link.href ? 'font-bold' : ''}`}>{link?.text}</span>
                 </Button>
 
                 <Button variant="light" as={link?.href ? Link : "button"} href={link?.href || undefined} size="lg" isIconOnly className="xl:hidden flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" radius="full">
-                  {pathname === link.href ? link.logo.filled : link.logo.outline}
+                  {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
                 </Button>
               </>
             )}
@@ -126,23 +119,25 @@ function Navigation({ session }: { session: Session }) {
         </li>
       </ul>
 
-      {session?.user && (
+      {user && (
         <>
           <Button size="lg" variant="light" className="xl:px-3 py-7 px-7 xl:justify-start justify-center items-center w-full max-w-[235px] hidden xl:flex" radius="full">
             <div className="flex items-center justify-center overflow-hidden gap-3">
-              <Image width={44} height={44} priority={true} alt={session?.user?.name!} src={session.user.image || '/default_white.jpg'} className="rounded-full w-11 h-11 flex-shrink-0" />
+              <Image width={44} height={44} priority={true} alt={user?.name!} src={user.image || '/default_white.jpg'} className="rounded-full w-11 h-11 flex-shrink-0" />
               <div className="text-left xl:flex flex-col items-start justify-center hidden gap-0 truncate">
-                <h3 className="font-bold truncate max-w-full">{session.user.name}</h3>
-                <p className="text-darkgray truncate max-w-full">@{session.user.username} aweaw wae</p>
+                <h3 className="font-bold truncate max-w-full">{user.name}</h3>
+                <p className="text-darkgray truncate max-w-full">@{user.username} aweaw wae</p>
               </div>
             </div>
           </Button>
           <Button size="lg" variant="light" className="xl:px-3 xl:py-7 xl:justify-start justify-center items-center sm:flex hidden min-w-0" isIconOnly radius="full">
             <div className="flex items-center justify-center gap-3">
-              <Image width={44} height={44} priority={true} alt={session?.user?.name!} src={session.user.image || '/default_white.jpg'} className="rounded-full w-11 h-11" />
+              <div className="w-[44px] h-[44px] relative">
+                <Image fill priority={true} alt={user?.name!} src={user.image || '/default_white.jpg'} className="rounded-full w-11 h-11 object-cover" />
+              </div>
               <div className="text-left xl:flex flex-col items-start justify-center hidden gap-0">
-                <h3 className="font-bold">{session.user.name}</h3>
-                <p className="text-darkgray">@{session.user.username}</p>
+                <h3 className="font-bold">{user.name}</h3>
+                <p className="text-darkgray">@{user.username}</p>
               </div>
             </div>
           </Button>

@@ -57,6 +57,7 @@ export interface AddTwitt {
   text: string,
   formData?: FormData,
   gif?: string,
+  replyTo?: string | number
 }
 
 export interface TwittsTable {
@@ -77,7 +78,7 @@ export interface TwittsTable {
 export interface ITwitt extends Omit<TwittsTable, 'image'> {
   username: string,
   name: string,
-  user_profile: string | null,
+  user_profile: string,
 }
 
 export interface Verification {
