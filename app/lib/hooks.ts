@@ -53,7 +53,7 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
   }, []);
 
   return {
-    className: `bg-background min-h-[40dvh] ${props?.className || ''} `,
+    className: `bg-background min-h-[100dvh] ${props?.className || ''} `,
     defaultOpen: props?.defaultOpen || true,
     isDismissable: props?.isDismissable || false,
     classNames: {

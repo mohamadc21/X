@@ -26,11 +26,11 @@ function PostModal({ children }: { children: React.ReactNode }) {
           router.back();
         }
       }}
+      {...modalProps({ size: "full" })}
       onClose={() => {
         dispatch(setReplyTo(null));
       }}
-      size="full"
-      className="min-h-[100dvh]"
+      placement="top"
     >
       <ModalContent>
         <ModalHeader />

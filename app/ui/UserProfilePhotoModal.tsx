@@ -28,15 +28,13 @@ function UserProfilePhotoModal({ mode }: { mode: 'profile' | 'header' }) {
       {...useModalProps({ defaultBackdrop: true, className: "bg-transparent shadow-none", isDismissable: true, classNames: { closeButton: "fixed left-6" } })}
     >
       <ModalContent>
-        {mode === 'header' ? (
-          <div className="fixed top-1/2 -translate-y-1/2 left-0 right-0 flex items-center justify-center h-[400px]">
+        <div className="fixed top-1/2 -translate-y-1/2 left-0 right-0 flex items-center justify-center h-[400px]">
+          {mode === 'header' ? (
             <Image src={userInfo?.header_photo!} className="object-cover" alt={userInfo?.name!} fill />
-          </div>
-        ) : (
-          <ModalBody className="flex items-center justify-center">
-            <Image src={userInfo?.profile!} objectFit="cover" alt={userInfo?.name!} width={400} height={400} className="rounded-full w-[400px] h-[400px] object-cover" />
-          </ModalBody>
-        )}
+          ) : (
+            <Image src={userInfo?.profile!} objectFit="cover" alt={userInfo?.name!} width={374} height={374} className="rounded-full w-[374px] h-[374px] object-cover" />
+          )}
+        </div>
       </ModalContent>
     </Modal>
   )
