@@ -26,10 +26,10 @@ function PostModal({ children }: { children: React.ReactNode }) {
           router.back();
         }
       }}
-      {...modalProps({ size: "xl" })}
       onClose={() => {
         dispatch(setReplyTo(null));
       }}
+      size="full"
       placement="top"
     >
       <ModalContent>

@@ -8,7 +8,7 @@ function TwittHeader() {
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 left-0 w-full bg-background/40 backdrop-blur-sm flex items-center gap-4 px-2 py-1.5 z-[3]">
+    <header className="sticky top-0 left-0 w-full bg-background/40 backdrop-blur-sm flex items-center gap-4 px-2 py-3 z-[3]">
       <Button variant="light" className="text-lg" radius="full" isIconOnly onClick={() => router.back()}>
         <ArrowLeftOutlined />
       </Button>
