@@ -1,4 +1,6 @@
 import "@/app/styles/globals.css";
+import '@vidstack/react/player/styles/default/theme.css';
+import '@vidstack/react/player/styles/default/layouts/video.css';
 import chirp from "@/app/ui/fonts/chirp";
 import Providers from "@/app/ui/providers/providers";
 import type { Metadata } from "next";
@@ -28,7 +30,7 @@ export default async function RootLayout({
       <body className={`${chirp.className}`}>
         <Providers>
           <NextTopLoader zIndex={100} showSpinner={false} />
-          <div className="min-h-screen flex flex-col mx-auto xl:max-w-full lg:max-w-[1100px] max-w-3xl pb-4 bg-background text-forground">
+          <div className="min-h-[100dvh] flex flex-col mx-auto xl:max-w-full lg:max-w-[1100px] max-w-3xl pb-4 bg-background text-forground">
             {/* <header></header> */}
             <main className="flex-1 flex flex-col justify-center sm:flex-row">
               {session && <SidebarWrapper />}

@@ -257,13 +257,13 @@ export async function signupWithOAuth(data: OAuthData): Promise<ActionError> {
   }
 }
 
-export async function uploadProfile(formData: FormData): Promise<ActionError> {
+export async function uploadProfile(formData: FormData) {
 
   const file = <File>formData.get('upload')!;
   const email = <string>formData.get('email')!;
 
   if (!file.type.startsWith('image/')) {
-    return { message: "image type not allowed. only image files allowed." }
+    throw new Error("image type not allowed. only image files allowed.");
   }
 
   // const fileSize = Math.floor(file.size / 1024);
@@ -282,22 +282,18 @@ export async function uploadProfile(formData: FormData): Promise<ActionError> {
 
     await query("update users set profile = ? where email = ?", [uploadUrl.toString(), email])
 
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
-    return {
-      message: 'an error occurred'
-    };
+    throw new Error(err.message);
   }
 
 }
 
-export async function uploadHeaderPhoto(formData: FormData): Promise<ActionError> {
+export async function uploadHeaderPhoto(formData: FormData) {
 
   const file = <File>formData.get('upload')!;
   if (!file.type.startsWith('image/')) {
-    return {
-      message: "image type not allowed. only image files allowed."
-    }
+    throw new Error("image type not allowed. only image files allowed.");
   }
 
   const email = <string>formData.get('email')!;
@@ -318,23 +314,19 @@ export async function uploadHeaderPhoto(formData: FormData): Promise<ActionError
 
     await query("update users set header_photo = ? where email = ?", [uploadUrl.toString(), email])
 
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
-    return {
-      message: 'an error occurred'
-    };
+    throw new Error(err.message);
   }
 
 }
 
-export async function uploadTwittMedia(formData: FormData): Promise<any> {
+export async function uploadTwittMedia(formData: FormData) {
 
   const file = <File>formData.get('media');
 
   if (!file.type.startsWith('video/') || !file.type.startsWith('image/')) {
-    return {
-      message: "media type not allowed. only image/gif and video files allowed."
-    }
+    throw new Error("media type not allowed. only image/gif and video files allowed.");
   }
 
   try {
@@ -348,9 +340,9 @@ export async function uploadTwittMedia(formData: FormData): Promise<any> {
 
     return uploadUrl.toString();
 
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
-    throw new Error('an error occurred');
+    throw new Error(err.message);
   }
 
 }

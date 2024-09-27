@@ -8,6 +8,8 @@ import CreatePost from "@/app/ui/createPost/CreatePost";
 import { ActionTypes } from "@/app/ui/Twitt";
 import TwittActions from "@/app/ui/TwittActions";
 import { Button, Card } from "@nextui-org/react";
+import { MediaPlayer, MediaProvider } from '@vidstack/react';
+import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
 import { format } from "date-fns";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -125,7 +127,10 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
         />
       )}
       {twitt.media && twitt.media_type === 'video' && (
-        <video src={twitt.media} width="100%" className="mt-4 rounded-2xl max-w-[600px]" controls></video>
+        <MediaPlayer src={twitt.media} className="mt-4">
+          <MediaProvider />
+          <DefaultVideoLayout icons={defaultLayoutIcons} />
+        </MediaPlayer>
       )}
       <ul className="flex items-center text-default-400">
         <li>{format(twitt.created_at.toISOString(), 'p')}</li>

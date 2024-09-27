@@ -2,17 +2,13 @@ import { increaseTwittView, likeTwitt } from "@/app/lib/actions";
 import { ITwitt, SessionUser } from "@/app/lib/definitions";
 import { useAppDispatch, useIsVisible } from "@/app/lib/hooks";
 import { setReplyTo } from "@/app/lib/slices/appSlice";
-import { Button } from "@nextui-org/react";
+import { MediaPlayer, MediaProvider } from '@vidstack/react';
+import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
 import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useOptimistic, useRef, useState } from "react";
-import { FaHeart, FaRegComment, FaRegHeart } from "react-icons/fa";
-import { GoBookmark } from "react-icons/go";
-import { LuRepeat2 } from "react-icons/lu";
-import { MdOutlineFileUpload } from "react-icons/md";
-import { SiSimpleanalytics } from "react-icons/si";
 import TwittActions from "./TwittActions";
 const numeral = require('numeral');
 
@@ -131,12 +127,12 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
       onClick={handleTwittClick}
     >
       {mediaOnly ? (
-        <Link href={`#`} className="w-full h-full">
+        <Link href={`/${user.username}`} className="w-full h-full">
           <img src={twitt.media!} className="w-full object-cover aspect-square" alt={twitt.text} />
         </Link>
       ) : (
         <div className="grid gap-4 to-twitt" style={{ gridTemplateColumns: '45px 1fr' }}>
-          <Link href={`#`} className="relative w-[45px] h-[45px]">
+          <Link href={`/${user.username}`} className="relative w-[45px] h-[45px]">
             <Image fill className="sm:block hidden rounded-full flex-shrink-0 object-cover" src={twitt.user_profile} alt={twitt.name!} />
             <Image fill className="sm:hidden block rounded-full flex-shrink-0 object-cover" src={twitt.user_profile} alt={twitt.name!} />
           </Link>
@@ -182,7 +178,10 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
                 />
               )}
               {twitt.media && twitt.media_type === 'video' && (
-                <video src={twitt.media} width="100%" className="mt-4 rounded-2xl max-h-[600px]" controls></video>
+                <MediaPlayer src={twitt.media} className="mt-4">
+                  <MediaProvider />
+                  <DefaultVideoLayout icons={defaultLayoutIcons} />
+                </MediaPlayer>
               )}
             </div>
             <TwittActions

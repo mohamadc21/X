@@ -16,6 +16,8 @@ import { MdGif } from "react-icons/md";
 import { useAppSelector, useModalProps } from "@/app/lib/hooks";
 import { format } from "date-fns";
 import { useSWRConfig } from "swr";
+import { MediaPlayer, MediaProvider } from '@vidstack/react';
+import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
 
 type Props = {
   user: SessionUser,
@@ -65,6 +67,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
     temp: null,
     type: null
   });
+  const [error, setError] = useState('');
   const [gifs, setGifs] = useState<any[]>([]);
   const [gif, setGif] = useState('');
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -91,7 +94,10 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
       }
       if (gif) twittData.gif = gif;
       if (replyTo) twittData.replyTo = replyTo.id;
-      await addTwitt(twittData);
+      const error = await addTwitt(twittData);
+      if (error) {
+        return setError(error.message);
+      }
       mutate('/api/twitts');
       mutate('/api/twitts/comments');
       mutate('/api/user/twitts');
@@ -173,7 +179,6 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
     }
   }, [isOpenEmojiPanel]);
 
-  console.log(media);
   useEffect(() => {
     setMounted(true);
     if (media.temp) {
@@ -249,9 +254,8 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                 {media.temp && (
                   <div className="relative">
                     <div className="relative">
-
                       {media.type === 'video' ? (
-                        <video className="rounded-2xl max-h-[600px]" width="100%" src={media.temp} controls />
+                        <video src={media.temp} width="100%" className="rounded-2xl max-h-[600px]" controls></video>
                       ) : (
                         <img className="w-full h-full rounded-2xl object-cover" src={media.temp} alt={`${user.name}s post image`} />
                       )}
@@ -291,7 +295,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
             </div>
           </ModalBody>
           <ModalFooter className="flex items-center justify-between py-3 sticky bottom-0 left-0 w-full gap-3">
-            <div className="flex max-[400px]:-ml-12 items-center gap-0.5">
+            <div className="flex items-center gap-0.5">
               {options.map((opt, idx) => (
                 <Button onClick={() => handleOptionClick(opt.type)} key={idx} isIconOnly size="sm" variant="light" radius="full" color="primary" isDisabled={!opt.type}>
                   {opt.icon}
@@ -342,7 +346,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
               {media.temp && (
                 <div className="relative">
                   {media.type === 'video' ? (
-                    <video className="rounded-2xl max-h-[600px]" width="100%" src={media.temp} controls />
+                    <video src={media.temp} width="100%" className="rounded-2xl max-h-[600px]" controls></video>
                   ) : (
                     <img className="w-full h-full rounded-2xl object-cover" src={media.temp} alt={`${user.name}s post image`} />
                   )}

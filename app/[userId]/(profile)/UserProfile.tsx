@@ -72,7 +72,7 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
   }, [pathname, currentTab]);
 
   return (
-    <div className="sm:border-x border-x-default flex-1 lg:max-w-full max-w-[600px] min-h-[200dvh]">
+    <div className="sm:border-x border-x-default flex-1 lg:max-w-full max-w-[600px] min-h-[100dvh]">
       <header className="sticky top-0 left-0 w-full bg-background/40 backdrop-blur-sm flex items-center gap-4 px-2 py-1.5 z-[3]">
         <Button variant="light" className="text-lg" radius="full" isIconOnly onClick={() => router.back()}>
           <ArrowLeftOutlined />

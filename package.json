@@ -20,6 +20,7 @@
     "@nextui-org/system": "^2.2.5",
     "@nextui-org/theme": "^2.2.9",
     "@reduxjs/toolkit": "^2.2.7",
+    "@vidstack/react": "^1.12.11",
     "appwrite": "^15.0.0",
     "bcryptjs": "^2.4.3",
     "date-fns": "^3.6.0",
