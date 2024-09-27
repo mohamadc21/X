@@ -406,10 +406,11 @@ export async function addTwitt({ userId, text, formData, gif, replyTo }: AddTwit
 
   if (formData?.get('image')) {
     try {
+      const media = formData.get('image') as File;
       const uploadUrl = await uploadTwittImage(formData);
       fields += ', media, media_type';
       values += ',?,?';
-      params.push(uploadUrl, 'image');
+      params.push(uploadUrl, media.type.split('/')[0]);
     } catch (err: any) {
       console.error(err.message);
       return {

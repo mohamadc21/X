@@ -291,13 +291,6 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                   {opt.icon}
                 </Button>
               ))}
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                hidden
-              />
             </div>
             <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">{replyTo ? 'Reply' : 'Post'}</Button>
 
@@ -342,7 +335,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
               </div>
               {image.temp && (
                 <div className="relative">
-                  <img className="w-full h-full rounded-2xl" src={image.temp} />
+                  <video className="w-full h-full rounded-2xl" width="100%" src={image.temp} controls />
                   <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setImage({ upload: null, temp: null })}>
                     <IoClose size="20" />
                   </Button>
@@ -365,13 +358,6 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                         {opt.icon}
                       </Button>
                     ))}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      onChange={handleFileUpload}
-                      hidden
-                    />
                   </div>
                   <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">{(type === 'reply' || replyTo) ? 'Reply' : 'Post'}</Button>
                 </div>
@@ -396,6 +382,13 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
           </div>
         </div>
       )}
+      <input
+        type="file"
+        accept="image/*, video/*"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        hidden
+      />
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}

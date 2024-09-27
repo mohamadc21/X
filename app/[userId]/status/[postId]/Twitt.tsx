@@ -54,6 +54,12 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
   }, [data]);
 
   useEffect(() => {
+    return () => {
+      dispatch(setReplyTo(null));
+    }
+  });
+
+  useEffect(() => {
     dispatch(setReplyTo(twitt));
   }, [twitt]);
 
@@ -119,7 +125,7 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
         />
       )}
       {twitt.media && twitt.media_type === 'video' && (
-        <video src={twitt.media} width="100%" className="aspect-video"></video>
+        <video src={twitt.media} width="100%" className="mt-4 rounded-2xl" controls></video>
       )}
       <ul className="flex items-center text-default-400">
         <li>{format(twitt.created_at.toISOString(), 'p')}</li>

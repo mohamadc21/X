@@ -181,6 +181,9 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
                   className="w-full mt-4 rounded-2xl to-twitt"
                 />
               )}
+              {twitt.media && twitt.media_type === 'video' && (
+                <video src={twitt.media} width="100%" className="mt-4 rounded-2xl" controls></video>
+              )}
             </div>
             <TwittActions
               twitt={twitt}
