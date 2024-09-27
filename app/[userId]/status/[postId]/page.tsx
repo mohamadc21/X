@@ -2,7 +2,6 @@ import React, { Suspense } from "react";
 import TwittWrapper from "./TwittWrapper";
 import TwittHeader from "./TwittHeader";
 import LoadingSpinner from "@/app/ui/LoadingSpinner";
-import TwittCommentsWrapper from "./TwittCommentsWrapper";
 
 function Page({ params }: { params: { postId: string } }) {
   return (

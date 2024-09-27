@@ -9,7 +9,7 @@ import React, { useEffect } from "react";
 
 function UserProfilePhotoModal({ mode }: { mode: 'profile' | 'header' }) {
   const { isOpen, onOpen } = useDisclosure();
-  const userInfo = useAppSelector(state => state.user.user.info);
+  const userInfo = useAppSelector(state => state.user.user);
   const router = useRouter();
   const pathname = usePathname();
 
