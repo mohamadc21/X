@@ -259,16 +259,14 @@ export async function signupWithOAuth(data: OAuthData): Promise<ActionError> {
 
 export async function uploadProfile(formData: FormData): Promise<ActionError> {
 
-  const allowedTypes = ['image/jpeg', 'image/pjp', 'image/png', 'image/jpg', 'image/pjpeg', 'image/jfif', 'image/webp']
-
   const file = <File>formData.get('upload')!;
   const email = <string>formData.get('email')!;
-  const fileSize = Math.floor(file.size / 1024);
 
-  if (!allowedTypes.includes(file.type)) return {
-    message: `image type not allowed. only ${allowedTypes.join(', ')} files`
-  };
+  if (!file.type.startsWith('image/')) {
+    return { message: "image type not allowed. only image files allowed." }
+  }
 
+  // const fileSize = Math.floor(file.size / 1024);
   // if (fileSize > 700) return {
   //   message: 'upload size must be less than 700 KB.'
   // };
@@ -292,18 +290,19 @@ export async function uploadProfile(formData: FormData): Promise<ActionError> {
   }
 
 }
+
 export async function uploadHeaderPhoto(formData: FormData): Promise<ActionError> {
 
-  const allowedTypes = ['image/jpeg', 'image/pjp', 'image/png', 'image/jpg', 'image/pjpeg', 'image/jfif', 'image/webp']
-
   const file = <File>formData.get('upload')!;
+  if (!file.type.startsWith('image/')) {
+    return {
+      message: "image type not allowed. only image files allowed."
+    }
+  }
+
   const email = <string>formData.get('email')!;
-  const fileSize = Math.floor(file.size / 1024);
 
-  if (!allowedTypes.includes(file.type)) return {
-    message: `image type not allowed. only ${allowedTypes.join(', ')} files`
-  };
-
+  // const fileSize = Math.floor(file.size / 1024);
   // if (fileSize > 700) return {
   //   message: 'upload size must be less than 700 KB.'
   // };
@@ -328,15 +327,15 @@ export async function uploadHeaderPhoto(formData: FormData): Promise<ActionError
 
 }
 
-export async function uploadTwittImage(formData: FormData): Promise<any> {
+export async function uploadTwittMedia(formData: FormData): Promise<any> {
 
-  const allowedTypes = ['image/jpeg', 'image/pjp', 'image/png', 'image/jpg', 'image/pjpeg', 'image/jfif', 'image/webp']
+  const file = <File>formData.get('media');
 
-  const file = <File>formData.get('image');
-
-  // if (!allowedTypes.includes(file.type)) {
-  //   throw new Error(`image type not allowed. only ${allowedTypes.join(', ')} files`);
-  // }
+  if (!file.type.startsWith('video/') || !file.type.startsWith('image/')) {
+    return {
+      message: "media type not allowed. only image/gif and video files allowed."
+    }
+  }
 
   try {
     const upload = await storage.createFile(
@@ -404,10 +403,10 @@ export async function addTwitt({ userId, text, formData, gif, replyTo }: AddTwit
   let values = '?,?,?,?,?,?';
   let params = [userId, text, '[]', '[]', '[]', `[${userId}]`];
 
-  if (formData?.get('image')) {
+  if (formData?.get('media')) {
     try {
-      const media = formData.get('image') as File;
-      const uploadUrl = await uploadTwittImage(formData);
+      const media = formData.get('media') as File;
+      const uploadUrl = await uploadTwittMedia(formData);
       fields += ', media, media_type';
       values += ',?,?';
       params.push(uploadUrl, media.type.split('/')[0]);

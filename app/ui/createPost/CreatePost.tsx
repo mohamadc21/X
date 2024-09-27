@@ -60,9 +60,10 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
   const [fullText, setFullText] = useState('');
   const [showFull, setShowFull] = useState(false);
   const [search, setSearch] = useState('');
-  const [image, setImage] = useState<{ upload: File | null, temp: string | null }>({
+  const [media, setMedia] = useState<{ upload: File | null, temp: string | null, type: 'video' | 'image' | null }>({
     upload: null,
-    temp: null
+    temp: null,
+    type: null
   });
   const [gifs, setGifs] = useState<any[]>([]);
   const [gif, setGif] = useState('');
@@ -83,9 +84,9 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
         userId: user.id!,
         text: fullText,
       }
-      if (image.upload) {
+      if (media.upload) {
         const formData = new FormData();
-        formData.append('image', image.upload);
+        formData.append('media', media.upload);
         twittData.formData = formData;
       }
       if (gif) twittData.gif = gif;
@@ -97,7 +98,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
       setText('');
       setFullText('');
       setGif('');
-      setImage({ upload: null, temp: null });
+      setMedia({ upload: null, temp: null, type: null });
       if (asModal) {
         router.back();
       }
@@ -121,7 +122,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
     if (!file) return;
     const tempImage = URL.createObjectURL(file);
     if (gif) setGif('');
-    setImage({ upload: file, temp: tempImage });
+    setMedia({ upload: file, temp: tempImage, type: file.type.split('/')[0] === 'video' ? 'video' : 'image' });
   }
 
   async function fetchGifsBySearch(searchTerm: string) {
@@ -130,8 +131,8 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
   }
 
   async function handleSelectGif(gifUrl: string) {
-    if (image.temp) {
-      setImage({ temp: null, upload: null });
+    if (media.temp) {
+      setMedia({ temp: null, upload: null, type: null });
     }
     setGif(gifUrl);
     onClose();
@@ -172,15 +173,15 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
     }
   }, [isOpenEmojiPanel]);
 
-
+  console.log(media);
   useEffect(() => {
     setMounted(true);
-    if (image.temp) {
+    if (media.temp) {
       return () => {
-        URL.revokeObjectURL(image.temp!);
+        URL.revokeObjectURL(media.temp!);
       }
     }
-  }, [image.temp]);
+  }, [media.temp]);
 
   return (
     <>
@@ -245,12 +246,17 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                     maxRows={12}
                   />
                 </div>
-                {image.temp && (
+                {media.temp && (
                   <div className="relative">
                     <div className="relative">
-                      <Image fill className="w-full h-full rounded-2xl object-cover" src={image.temp} alt={`${user.name}s post image`} />
+
+                      {media.type === 'video' ? (
+                        <video className="rounded-2xl max-h-[600px]" width="100%" src={media.temp} controls />
+                      ) : (
+                        <img className="w-full h-full rounded-2xl object-cover" src={media.temp} alt={`${user.name}s post image`} />
+                      )}
                     </div>
-                    <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setImage({ upload: null, temp: null })}>
+                    <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setMedia({ upload: null, temp: null, type: null })}>
                       <IoClose size="20" />
                     </Button>
                     <Button variant="faded" onClick={() => handleOptionClick('uploadImage')} size="sm" className=" absolute top-2 left-2 text-base" radius="full">Edit</Button>
@@ -292,7 +298,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                 </Button>
               ))}
             </div>
-            <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">{replyTo ? 'Reply' : 'Post'}</Button>
+            <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !media.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">{replyTo ? 'Reply' : 'Post'}</Button>
 
           </ModalFooter>
         </>
@@ -333,10 +339,14 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                   <Button isDisabled size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">Reply</Button>
                 )}
               </div>
-              {image.temp && (
+              {media.temp && (
                 <div className="relative">
-                  <video className="w-full h-full rounded-2xl" width="100%" src={image.temp} controls />
-                  <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setImage({ upload: null, temp: null })}>
+                  {media.type === 'video' ? (
+                    <video className="rounded-2xl max-h-[600px]" width="100%" src={media.temp} controls />
+                  ) : (
+                    <img className="w-full h-full rounded-2xl object-cover" src={media.temp} alt={`${user.name}s post image`} />
+                  )}
+                  <Button variant="faded" isIconOnly size="sm" radius="full" className="absolute top-2 right-2 " onClick={() => setMedia({ upload: null, temp: null, type: null })}>
                     <IoClose size="20" />
                   </Button>
                   <Button variant="faded" onClick={() => handleOptionClick('uploadImage')} size="sm" className=" absolute top-2 left-2 text-base" radius="full">Edit</Button>
@@ -359,7 +369,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                       </Button>
                     ))}
                   </div>
-                  <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">{(type === 'reply' || replyTo) ? 'Reply' : 'Post'}</Button>
+                  <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !media.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">{(type === 'reply' || replyTo) ? 'Reply' : 'Post'}</Button>
                 </div>
               )}
               {mounted && (
