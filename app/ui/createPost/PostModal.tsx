@@ -30,7 +30,6 @@ function PostModal({ children }: { children: React.ReactNode }) {
         dispatch(setReplyTo(null));
       }}
       size="full"
-      placement="top"
     >
       <ModalContent>
         <ModalHeader />
