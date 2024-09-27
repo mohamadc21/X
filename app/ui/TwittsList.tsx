@@ -13,20 +13,25 @@ type TwittsListProps = {
   allTwitts: ITwitt[],
   mediaOnly?: boolean,
   userId?: number | string,
-  type: 'without_replies' | 'with_replies'
+  twittId?: number | string,
+  type?: 'without_replies' | 'with_replies' | 'comments'
 }
 
-function TwittsList({ session, allTwitts, mediaOnly = false, userId, type }: TwittsListProps) {
+function TwittsList({ session, allTwitts, mediaOnly = false, userId, twittId, type }: TwittsListProps) {
   const [twitts, setTwitts] = useState(allTwitts);
   const dispatch = useDispatch();
-  useSWR<ITwitt[]>(`${userId ? '/api/user/twitts' : '/api/twitts'}`, async () => {
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/${userId ? `user/twitts?id=${userId}${type === 'without_replies' ? '&include_replies=false' : ''}` : `twitts${type === 'without_replies' ? '?include_replies=false' : ''}`}`);
+  useSWR<ITwitt[]>(`${type === 'comments' ? '/api/twitts/comments' : (userId ? '/api/user/twitts' : '/api/twitts')}`, async () => {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/${type === 'comments' ? `twitts/comments?id=${twittId}` : (userId ? `user/twitts?id=${userId}${type === 'without_replies' ? '&include_replies=false' : ''}` : `twitts${type === 'without_replies' ? '?include_replies=false' : ''}`)}`);
     const data = await resp.json();
     setTwitts(data);
     return data;
   }, {
     refreshInterval: 5000,
   });
+
+  useEffect(() => {
+    setTwitts(allTwitts);
+  }, [allTwitts]);
 
   useEffect(() => {
     if (twitts) {

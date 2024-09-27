@@ -33,8 +33,15 @@ export async function getAlltwitts({ byUsername = false, username, with_reply = 
   return allTwitts;
 }
 
+export async function getTwittById(id: number | string): Promise<ITwitt | null> {
+  const [twitt] = await query<ITwitt[]>('select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.id = ? order by twitts.id desc', [id]);
+  if (!twitt) return null
+
+  return twitt;
+}
+
 export async function getTwittComments(twitt_id: number | string) {
-  const comments = await query<ITwitt[]>("select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where reply_to = ? order by twitts.id desc", [twitt_id]);
+  const comments = await query<ITwitt[]>("select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.retwitts, twitts.comments, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.reply_to = ? order by twitts.id desc", [twitt_id]);
 
   return comments;
 }

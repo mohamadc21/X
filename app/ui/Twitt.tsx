@@ -13,8 +13,10 @@ import { GoBookmark } from "react-icons/go";
 import { LuRepeat2 } from "react-icons/lu";
 import { MdOutlineFileUpload } from "react-icons/md";
 import { SiSimpleanalytics } from "react-icons/si";
+import TwittActions from "./TwittActions";
+const numeral = require('numeral');
 
-const ActionTypes = {
+export const ActionTypes = {
   INCREASE_VIEW: "INCREASE_VIEW",
   LIKE_TWITT: "LIKE_TWITT",
   UNLIKE_TWITT: "UNLIKE_TWITT"
@@ -105,6 +107,12 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
     }
   }
 
+  function handleTwittClick(e: React.MouseEvent<any>) {
+    const targetClassList = (e.target as Element).classList;
+    if (targetClassList.contains('to-twitt')) {
+      router.push(`/${user.username}/status/${twitt.id}`);
+    }
+  }
 
   useEffect(() => {
     if (!isVisible) return;
@@ -117,20 +125,24 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
   }, [isVisible]);
 
   return (
-    <div ref={twittRef} className={`${mediaOnly ? '' : 'border-b border-default px-4 py-3'} bg-transparent hover:bg-default/15 transition cursor-pointer`} >
+    <div
+      ref={twittRef}
+      className={`${mediaOnly ? '' : 'border-b border-default px-4 py-3'} bg-transparent hover:bg-default/15 transition cursor-pointer to-twitt`}
+      onClick={handleTwittClick}
+    >
       {mediaOnly ? (
-        <div className="w-full h-full">
+        <Link href={`#`} className="w-full h-full">
           <img src={twitt.media!} className="w-full object-cover aspect-square" alt={twitt.text} />
-        </div>
+        </Link>
       ) : (
-        <div className="grid gap-4" style={{ gridTemplateColumns: '45px 1fr' }}>
-          <div className="relative w-[45px] h-[45px]">
+        <div className="grid gap-4 to-twitt" style={{ gridTemplateColumns: '45px 1fr' }}>
+          <Link href={`#`} className="relative w-[45px] h-[45px]">
             <Image fill className="sm:block hidden rounded-full flex-shrink-0 object-cover" src={twitt.user_profile} alt={twitt.name!} />
             <Image fill className="sm:hidden block rounded-full flex-shrink-0 object-cover" src={twitt.user_profile} alt={twitt.name!} />
-          </div>
-          <div className="flex flex-col gap-3 sm:ml-0 -ml-[7px]">
-            <div>
-              <div className="flex items-start gap-4 whitespace-nowrap">
+          </Link>
+          <div className="flex flex-col gap-3 sm:ml-0 -ml-[7px] to-twitt">
+            <div className="to-twitt">
+              <div className="flex items-start gap-4 whitespace-nowrap to-twitt">
                 <div className="flex items-center gap-1 truncate overflow-hidden">
                   <Link href={`/${twitt.username}`} className="font-bold max-[400px]:text-[15px] text-foreground">{twitt.name}</Link>
                   <Link href={`/${twitt.username}`} className="text-default-400 overflow-hidden max-[400px]:text-[13px]">@{twitt.username}</Link>
@@ -140,7 +152,7 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
               </div>
               {twitt.text && (
                 <p
-                  className="whitespace-pre-wrap leading-5 break-words"
+                  className="whitespace-pre-wrap leading-5 break-words to-twitt"
                   dangerouslySetInnerHTML={{ __html: twitt.text }}
                 />
               )}
@@ -151,7 +163,7 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
                   objectFit="contain"
                   alt="twitt image"
                   priority={true}
-                  className="mt-4 rounded-2xl"
+                  className="mt-4 rounded-2xl to-twitt"
                   onLoad={target => {
                     setSmageSize({
                       width: target.currentTarget.naturalWidth,
@@ -166,57 +178,20 @@ function Twitt({ twitt: initialTwitt, user, setTwitts, mediaOnly }: TwittProps) 
                 <img
                   src={twitt.media}
                   alt="twitt image"
-                  className="w-full mt-4 rounded-2xl"
+                  className="w-full mt-4 rounded-2xl to-twitt"
                 />
               )}
             </div>
-            <div className="flex items-center gap-4 justify-between -ml-2">
-              <Button onClick={() => {
+            <TwittActions
+              twitt={twitt}
+              user={user}
+              onCommentsClick={() => {
                 dispatch(setReplyTo(twitt));
                 router.push('/post');
-              }} variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0">
-                <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
-                  <FaRegComment size={17} className="relative" />
-                </div>
-                <span className="text-sm -ml-1">{twitt.comments.length}</span>
-              </Button>
-              <Button variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-emerald-400 border-none group gap-0 transition-all duration-150 min-w-0 px-0">
-                <div className="rounded-full py-1.5 px-2 group-hover:bg-emerald-400/20">
-                  <LuRepeat2 size={20} />
-                </div>
-                <span className="text-sm -ml-1">{twitt.retwitts.length}</span>
-              </Button>
-              <form action={handleTwittLike}>
-                <Button type="submit" variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-pink-600 border-none group gap-0 transition-all duration-150 min-w-0 px-0">
-                  <div className="rounded-full py-1.5 px-2 group-hover:bg-pink-600/20">
-                    {twitt.likes.includes(user.id!) ? (
-                      <FaHeart className="text-rose-500" size={15.5} />
-                    ) : (
-                      <FaRegHeart size={15.5} />
-                    )}
-                  </div>
-                  <span className="text-sm -ml-1">{twitt.likes.length}</span>
-                </Button>
-              </form>
-              <Button variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0">
-                <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
-                  <SiSimpleanalytics size={12} />
-                </div>
-                <span className="text-sm -ml-1">{twitt.views.length}</span>
-              </Button>
-              <div className="flex items-center">
-                <Button isIconOnly radius="full" size="sm" variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0">
-                  <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
-                    <GoBookmark size={20} />
-                  </div>
-                </Button>
-                <Button isIconOnly radius="full" size="sm" variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-primary border-none group gap-0 transition-all duration-150 min-w-0 px-0">
-                  <div className="rounded-full py-1.5 px-2 group-hover:bg-primary/20">
-                    <MdOutlineFileUpload size={20} />
-                  </div>
-                </Button>
-              </div>
-            </div>
+              }}
+              onLike={handleTwittLike}
+              className="-ml-2 to-twitt"
+            />
           </div>
         </div>
       )}

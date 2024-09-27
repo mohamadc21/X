@@ -62,7 +62,7 @@ export interface AddTwitt {
 
 export interface TwittsTable {
   id: number,
-  userId: string | number,
+  user_id: string | number,
   text: string,
   media: string | null,
   media_type: 'image' | 'gif' | 'video' | null,

@@ -17,6 +17,15 @@ import { useAppSelector, useModalProps } from "@/app/lib/hooks";
 import { format } from "date-fns";
 import { useSWRConfig } from "swr";
 
+type Props = {
+  user: SessionUser,
+  asModal?: boolean,
+  rows?: number,
+  noPadding?: boolean,
+  type?: 'post' | 'reply',
+  showOnClick?: boolean,
+}
+
 const options = [
   {
     type: 'uploadImage',
@@ -44,11 +53,12 @@ const options = [
   // },
 ]
 
-function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: boolean }) {
+function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post", showOnClick = false }: Props) {
   const [mounted, setMounted] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [text, setText] = useState('');
   const [fullText, setFullText] = useState('');
+  const [showFull, setShowFull] = useState(false);
   const [search, setSearch] = useState('');
   const [image, setImage] = useState<{ upload: File | null, temp: string | null }>({
     upload: null,
@@ -82,6 +92,8 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
       if (replyTo) twittData.replyTo = replyTo.id;
       await addTwitt(twittData);
       mutate('/api/twitts');
+      mutate('/api/twitts/comments');
+      mutate('/api/user/twitts');
       setText('');
       setFullText('');
       setGif('');
@@ -151,7 +163,6 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
       if (isOpenEmojiPanel && !emojiPickerRef.current?.contains(e.target as Node)) {
         setIsOpenEmojiPanel(false);
       }
-
     }
 
     document.addEventListener('click', handleClickOutside);
@@ -230,7 +241,7 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                       setText(e.target.value);
                       setFullText(e.target.value);
                     }}
-                    minRows={2}
+                    minRows={rows}
                     maxRows={12}
                   />
                 </div>
@@ -293,7 +304,7 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
           </ModalFooter>
         </>
       ) : (
-        <div className="px-4">
+        <div className={noPadding ? '' : 'px-4'}>
           <div className="flex gap-1">
             <div className="relative w-[44px] h-[44px] flex-shrink-0">
               <Image
@@ -305,11 +316,11 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
               />
             </div>
             <div className="w-full relative">
-              <div className="relative">
+              <div className="flex items-center justify-between">
                 <Textarea
                   variant="bordered"
                   size="lg"
-                  placeholder="What&apos;s happening?!"
+                  placeholder={(type === 'reply' || replyTo) ? 'Post your reply' : 'What\'s happening?!'}
                   classNames={{
                     input: "text-xl max-[380px]:text-lg placeholder:text-default-400",
                     inputWrapper: "border-none",
@@ -319,9 +330,15 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                     setText(e.target.value);
                     setFullText(e.target.value);
                   }}
-                  minRows={2}
+                  minRows={rows}
                   maxRows={50}
+                  onClick={() => {
+                    showOnClick ? setShowFull(true) : null
+                  }}
                 />
+                {(showOnClick && !showFull) && (
+                  <Button isDisabled size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">Reply</Button>
+                )}
               </div>
               {image.temp && (
                 <div className="relative">
@@ -340,24 +357,25 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                   </Button>
                 </div>
               )}
-
-              <div className="flex items-center justify-between py-3 sticky bottom-0 left-0 w-full gap-3">
-                <div className="flex max-[400px]:-ml-12 items-center gap-0.5">
-                  {options.map((opt, idx) => (
-                    <Button onClick={() => handleOptionClick(opt.type)} key={idx} isIconOnly size="sm" variant="light" radius="full" color="primary" isDisabled={!opt.type}>
-                      {opt.icon}
-                    </Button>
-                  ))}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                    hidden
-                  />
+              {(!showOnClick || (showOnClick && showFull)) && (
+                <div className={`flex items-center justify-between sticky bottom-0 left-0 w-full gap-3 bg-background ${showOnClick && showFull ? 'pt-3' : 'py-3'}`}>
+                  <div className="flex max-[400px]:-ml-12 items-center gap-0.5">
+                    {options.map((opt, idx) => (
+                      <Button onClick={() => handleOptionClick(opt.type)} key={idx} isIconOnly size="sm" variant="light" radius="full" color="primary" isDisabled={!opt.type}>
+                        {opt.icon}
+                      </Button>
+                    ))}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                      hidden
+                    />
+                  </div>
+                  <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">{(type === 'reply' || replyTo) ? 'Reply' : 'Post'}</Button>
                 </div>
-                <Button isLoading={isPending} spinner={<LoadingSpinner size="sm" color="#fff" />} onClick={handleAddTwitt} isDisabled={(!text.trim() || isPending) && !image.upload && !gif} size="sm" color="primary" radius="full" className="font-bold ml-auto text-base">{replyTo ? 'Reply' : 'Post'}</Button>
-              </div>
+              )}
               {mounted && (
                 <div className="absolute top-full" ref={emojiPickerRef}>
                   <EmojiPicker
@@ -373,7 +391,6 @@ function CreatePost({ user, asModal = false }: { user: SessionUser, asModal?: bo
                     style={{ "--epr-emoji-size": "20px", "--epr-bg-color": "bg-background", "--epr-category-label-bg-color": "bg-background" } as React.CSSProperties}
                   />
                 </div>
-
               )}
             </div>
           </div>

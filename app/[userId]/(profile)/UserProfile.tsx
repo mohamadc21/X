@@ -10,14 +10,22 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { follow, unFollow } from "@/app/lib/actions";
-import { SessionUser, User, UserFollowingsAndFollowers } from "@/app/lib/definitions";
+import { ITwitt, SessionUser, User, UserFollowingsAndFollowers } from "@/app/lib/definitions";
 import { useAppDispatch } from "@/app/lib/hooks";
 import { FaLocationDot } from "react-icons/fa6";
-import { setInfo } from "@/app/lib/slices/userSlice";
+import { setUserData } from "@/app/lib/slices/userSlice";
 import { GrAttachment } from "react-icons/gr";
 import useSWR from "swr";
 
-function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: { children: React.ReactNode, user: User, headerSubtitle: string, follows: UserFollowingsAndFollowers, sessionUser?: SessionUser }) {
+type Props = {
+  children: React.ReactNode,
+  user: User & { twitts: ITwitt[] },
+  headerSubtitle: string,
+  follows: UserFollowingsAndFollowers,
+  sessionUser?: SessionUser
+};
+
+function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: Props) {
   const [profileDetails, setProfileDetails] = useState({ ...user, follows });
   const [followingText, setFollowingText] = useState('Following');
   const router = useRouter();
@@ -37,34 +45,35 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: {
     refreshInterval: 10000
   });
 
-  async function handleLike() {
+  async function hanldeFollow() {
     setProfileDetails(prev => ({ ...prev, follows: { ...follows, followers: [...prev.follows.followers, sessionUser?.id! as unknown as number] } }));
     await follow(sessionUser?.id!, user.id);
   }
 
-  async function handleUnlike() {
+  async function hanldeUnfollow() {
     setProfileDetails(prev => ({ ...prev, follows: { ...follows, followers: prev.follows.followers.filter(follower => follower != sessionUser?.id) } }));
     await unFollow(sessionUser?.id!, user.id);
   }
 
   useEffect(() => {
     setProfileDetails({ ...user, follows });
-    dispatch(setInfo({
+    dispatch(setUserData({
       ...user,
-      created_at: user.created_at.toLocaleString() as string,
-      updated_at: user.updated_at.toLocaleString() as string,
+      created_at: user.created_at as string,
+      updated_at: user.updated_at as string,
+      twitts: user.twitts
     }));
   }, [user, follows]);
 
   useEffect(() => {
-    if (pathname === `/${user.username}`) setCurrentTab('posts');
-    if (pathname === `/${user.username}/with_replies`) setCurrentTab('replies');
-    if (pathname === `/${user.username}/media`) setCurrentTab('media');
+    if (pathname === `/${profileDetails.username}`) setCurrentTab('posts');
+    if (pathname === `/${profileDetails.username}/with_replies`) setCurrentTab('replies');
+    if (pathname === `/${profileDetails.username}/media`) setCurrentTab('media');
   }, [pathname, currentTab]);
 
   return (
     <div className="sm:border-x border-x-default flex-1 lg:max-w-full max-w-[600px] min-h-[200dvh]">
-      <header className="sticky top-0 left-0 w-full bg-background/60 backdrop-blur flex items-center gap-4 px-2 py-1.5 z-[3]">
+      <header className="sticky top-0 left-0 w-full bg-background/40 backdrop-blur-sm flex items-center gap-4 px-2 py-1.5 z-[3]">
         <Button variant="light" className="text-lg" radius="full" isIconOnly onClick={() => router.back()}>
           <ArrowLeftOutlined />
         </Button>
@@ -74,7 +83,7 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: {
         </div>
       </header>
       <div>
-        {user.header_photo ? (
+        {profileDetails.header_photo ? (
           <Card radius="none" isPressable onClick={() => router.push(`/${profileDetails.username}/header_photo`)} className="w-full h-[200px] relative">
             <Image fill objectFit="cover" priority={true} src={profileDetails.header_photo!} alt={profileDetails.name} />
           </Card>
@@ -83,7 +92,7 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: {
         )}
         <div className="px-4 flex justify-between mb-3">
           <div className="flex flex-col -mt-[12%] gap-3">
-            <Card isPressable className="h-[140px] w-[140px] min-w-max rounded-full border-4 border-background relative" onClick={() => router.push(`/${user.username}/photo`)}>
+            <Card isPressable className="h-[140px] w-[140px] min-w-max rounded-full border-4 border-background relative" onClick={() => router.push(`/${profileDetails.username}/photo`)}>
               <Image fill src={profileDetails.profile || '/default_white.jpg'} className="object-cover" alt={profileDetails.name} />
             </Card>
             <div>
@@ -121,17 +130,17 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: {
           </div>
           <div className="mt-3">
             {profileDetails.id == sessionUser?.id! as number ? (
-              <Button variant="bordered" className="font-bold text-base" radius="full" onClick={() => router.push(`/${user.username}/settings/profile`)}>
+              <Button variant="bordered" className="font-bold text-base" radius="full" onClick={() => router.push(`/${profileDetails.username}/settings/profile`)}>
                 Edit Profile
               </Button>
             ) : (
               <>
                 {profileDetails.follows.followers.some(follower => follower == sessionUser?.id! as number) ? (
-                  <Button variant="bordered" className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger" radius="full" onPointerEnter={() => setFollowingText("Unfollow")} onPointerLeave={() => setFollowingText("Following")} onClick={handleUnlike}>
+                  <Button variant="bordered" className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger" radius="full" onPointerEnter={() => setFollowingText("Unfollow")} onPointerLeave={() => setFollowingText("Following")} onClick={hanldeUnfollow}>
                     {followingText}
                   </Button>
                 ) : (
-                  <Button onClick={handleLike} color="secondary" className="font-bold text-base" radius="full">
+                  <Button onClick={hanldeFollow} color="secondary" className="font-bold text-base" radius="full">
                     Follow
                   </Button>
                 )}

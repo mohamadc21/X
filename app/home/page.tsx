@@ -8,7 +8,6 @@ import Header from "@/app/ui/Header";
 export const metadata: Metadata = {
   title: "Home"
 }
-export const revalidate = 0;
 
 async function Page() {
   const session = await auth();
@@ -16,7 +15,7 @@ async function Page() {
   return (
     <div>
       <Header user={session?.user} />
-      <TwittsWrapper />
+      <TwittsWrapper session={session} />
     </div>
   )
 }
