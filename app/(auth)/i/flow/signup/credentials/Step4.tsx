@@ -22,9 +22,10 @@ function Step4({ onTransition }: { onTransition: (callback: () => Promise<any>) 
       const formData = new FormData();
       formData.append('upload', file);
       formData.append('email', user!.email);
-      const error = await uploadProfile(formData);
-      if (error) {
-        return setError(error.message!);
+      try {
+        await uploadProfile(formData);
+      } catch (err: any) {
+        return setError(err.message);
       }
       update('trigger');
       dispatch(setSignupData({ data: { ...user! }, step: 5 }));
