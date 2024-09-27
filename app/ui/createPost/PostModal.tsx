@@ -30,6 +30,7 @@ function PostModal({ children }: { children: React.ReactNode }) {
         dispatch(setReplyTo(null));
       }}
       size="full"
+      className="min-h-[100dvh]"
     >
       <ModalContent>
         <ModalHeader />
