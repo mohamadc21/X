@@ -10,7 +10,6 @@ import React, { useEffect } from "react";
 function PostModal({ children }: { children: React.ReactNode }) {
   const { onOpen, isOpen, onClose } = useDisclosure();
   const router = useRouter();
-  const modalProps = useModalProps;
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -26,7 +25,7 @@ function PostModal({ children }: { children: React.ReactNode }) {
           router.back();
         }
       }}
-      {...modalProps({ size: "full" })}
+      {...useModalProps({ size: "2xl" })}
       onClose={() => {
         dispatch(setReplyTo(null));
       }}

@@ -45,15 +45,17 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
 
     inMobileCheck();
 
+    window.addEventListener('load', inMobileCheck)
     window.addEventListener('resize', inMobileCheck)
 
     return () => {
+      window.removeEventListener('load', inMobileCheck)
       window.removeEventListener('resize', inMobileCheck);
     }
-  }, []);
+  }, [window.innerWidth]);
 
   return {
-    className: `bg-background min-h-[100dvh] ${props?.className || ''} `,
+    className: `bg-background min-h-[40dvh] ${props?.className || ''} `,
     defaultOpen: props?.defaultOpen || true,
     isDismissable: props?.isDismissable || false,
     classNames: {
