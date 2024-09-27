@@ -95,6 +95,7 @@ export interface ModalProps {
   defaultBackdrop?: boolean,
   centerContent?: boolean,
   classNames?: {
+    wrapper?: string | undefined,
     base?: string | undefined,
     header?: string | undefined,
     backdrop?: string | undefined,
