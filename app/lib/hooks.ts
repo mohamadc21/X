@@ -53,14 +53,14 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
   }, []);
 
   return {
-    className: `bg-background min-h-[40dvh] ${props?.className || ''} bg-green-600`,
+    className: `bg-background min-h-[40dvh] ${props?.className || ''}`,
     defaultOpen: props?.defaultOpen || true,
     isDismissable: props?.isDismissable || false,
     classNames: {
-      wrapper: props?.classNames?.wrapper || 'bg-red-500 block items-unset justify-unset',
+      wrapper: props?.classNames?.wrapper || 'items-stretch',
       backdrop: `${props?.classNames?.backdrop} ${props?.defaultBackdrop || 'bg-gray-700/70'}`,
       header: `${props?.classNames?.header || ''} z-[3] bg-background`,
-      body: `${props?.classNames?.body} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'} pb-4 pt-8 overflow-y-auto bg-blue-400`,
+      body: `${props?.classNames?.body} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'} pb-4 pt-8 overflow-y-auto`,
       footer: `${props?.classNames?.footer} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'}`,
       closeButton: `text-xl left-2.5 right-[none] z-[4] top-3 ${props?.classNames?.closeButton}`,
     },

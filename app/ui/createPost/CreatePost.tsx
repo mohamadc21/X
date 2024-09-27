@@ -403,7 +403,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
         onChange={handleFileUpload}
         hidden
       />
-      <Modal
+      {/* <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         placement="top"
@@ -445,7 +445,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
             </div>
           </ModalBody>
         </ModalContent>
-      </Modal>
+      </Modal> */}
     </>
   )
 }
