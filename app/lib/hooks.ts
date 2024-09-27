@@ -34,23 +34,23 @@ export const useIsVisible = (ref: React.RefObject<HTMLElement>) => {
 
 
 export const useModalProps = (props?: ModalProps): ModalProps => {
-  const [inMobile, setInMobile] = useState(false);
+  const [inMobile, setInMobile] = useState(true);
 
-  useEffect(() => {
-    const inMobileCheck = () => {
-      if (window?.innerWidth < 641) {
-        setInMobile(true);
-      } else setInMobile(false);
-    }
-
-    inMobileCheck();
-
-    window.addEventListener('resize', inMobileCheck)
-
-    return () => {
-      window.removeEventListener('resize', inMobileCheck);
-    }
-  }, []);
+  //   useEffect(() => {
+  //     const inMobileCheck = () => {
+  //       if (window?.innerWidth < 641) {
+  //         setInMobile(true);
+  //       } else setInMobile(false);
+  //     }
+  // 
+  //     inMobileCheck();
+  // 
+  //     window.addEventListener('resize', inMobileCheck)
+  // 
+  //     return () => {
+  //       window.removeEventListener('resize', inMobileCheck);
+  //     }
+  //   }, []);
 
   return {
     className: `bg-background min-h-[40dvh] ${props?.className || ''} `,
