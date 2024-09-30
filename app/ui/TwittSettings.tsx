@@ -11,7 +11,7 @@ import { ITwitt, SessionUser } from "@/app/lib/definitions";
 
 function TwittSettings({ onMenuAction, twitt, user }: { onMenuAction: (e: Key) => void, twitt: ITwitt, user: SessionUser }) {
   return (
-    <Dropdown className="bg-background">
+    <Dropdown className="bg-background !z-[1]">
       <DropdownTrigger>
         <Button
           variant="light"
