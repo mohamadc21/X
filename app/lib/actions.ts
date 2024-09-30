@@ -81,6 +81,10 @@ export async function getUserFollowersAndFollowings(user_id: number | string): P
   };
 }
 
+export async function deleteTwitt(twitt_id: number | string) {
+  await query("delete from twitts where id = ?", [twitt_id]);
+}
+
 export async function signinWithGoogle() {
   await signIn('google', {
     redirectTo: '/home'
@@ -325,7 +329,7 @@ export async function uploadTwittMedia(formData: FormData) {
 
   const file = <File>formData.get('media');
 
-  if (!file.type.startsWith('video/') || !file.type.startsWith('image/')) {
+  if (!file.type.startsWith('video/')) {
     throw new Error("media type not allowed. only image/gif and video files allowed.");
   }
 
@@ -428,6 +432,7 @@ export async function addTwitt({ userId, text, formData, gif, replyTo }: AddTwit
       replyTo ? query("update twitts set comments = json_array_append(comments, '$', ?) where id = ?", [replyTo?.toString(), replyTo]) : null
     ]
     );
+    revalidatePath('/home');
   } catch (err) {
     console.error(err);
     return { message: 'an error occurred' }

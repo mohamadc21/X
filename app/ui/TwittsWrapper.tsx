@@ -7,7 +7,7 @@ import TwittsList from "./TwittsList";
 
 async function TwittsWrapper({ session }: { session: Session }) {
   return (
-    <div className="sm:pt-1.5 sm:min-h-[98dvh] overflow-hidden w-full sm:mb-0 mb-11 sm:border-x border-default">
+    <div className="sm:min-h-[98dvh] overflow-hidden w-full sm:mb-0 mb-11 sm:border-x border-default">
       <div className="sm:block hidden border-b border-default">
         <CreatePost user={session.user!} />
       </div>

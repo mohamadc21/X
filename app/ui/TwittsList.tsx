@@ -1,5 +1,6 @@
 "use client";
 
+import React from 'react';
 import { ITwitt } from "@/app/lib/definitions";
 import { setTwitts as setTwittsSlice } from '@/app/lib/slices/appSlice';
 import { Session } from "next-auth";

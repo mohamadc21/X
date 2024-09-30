@@ -1,5 +1,6 @@
 "use client";
 
+import React from 'react';
 import { follow, increaseTwittView, likeTwitt, unFollow } from "@/app/lib/actions";
 import { ITwitt, SessionUser, UserFollowingsAndFollowers } from "@/app/lib/definitions";
 import { useAppDispatch } from "@/app/lib/hooks";
@@ -14,6 +15,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
 const numeral = require('numeral');
 
 function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowingsAndFollowers }, sessionUser: SessionUser }) {
@@ -98,6 +100,7 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
       {twitt.text && (
         <p
           className="whitespace-pre-wrap leading-5 break-words to-twitt text-lg"
+          dir={/[\u0600-\u06FF]/.test(twitt.text) ? 'rtl' : 'ltr'}
           dangerouslySetInnerHTML={{ __html: twitt.text }}
         />
       )}

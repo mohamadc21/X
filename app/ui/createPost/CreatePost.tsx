@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { useSWRConfig } from "swr";
 import { MediaPlayer, MediaProvider } from '@vidstack/react';
 import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
+import Alert from "../Alert";
 
 type Props = {
   user: SessionUser,
@@ -70,6 +71,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
   const [error, setError] = useState('');
   const [gifs, setGifs] = useState<any[]>([]);
   const [gif, setGif] = useState('');
+  const [isPersianKeyboard, setIsPersianKeyboard] = useState(false);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const gf = new GiphyFetch('ywdLkUP7O8eyz3Q3cndJ1oTmQyOIg15U')
   const { isOpen, onOpenChange, onOpen, onClose } = useDisclosure();
@@ -109,6 +111,10 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
         router.back();
       }
     });
+  }
+
+  function checkUserKeyboard(e: ChangeEvent<HTMLInputElement>) {
+    setIsPersianKeyboard(/[\u0600-\u06FF]/.test(e.target.value) ? true : false);
   }
 
   function handleOptionClick(option: string) {
@@ -154,7 +160,6 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
     async function fetchCategories() {
       const { data } = await gf.categories({ limit: 3 });
       setCategories(data);
-      console.log(data);
     }
 
     // fetchCategories();
@@ -237,6 +242,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                   <Textarea
                     variant="bordered"
                     size="lg"
+                    dir={isPersianKeyboard ? 'rtl' : 'ltr'}
                     placeholder={`${replyTo ? 'Post your reply' : 'What\'s happening?!'}`}
                     classNames={{
                       input: "text-xl max-[380px]:text-lg placeholder:text-default-400",
@@ -244,6 +250,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                     }}
                     value={text}
                     onChange={(e) => {
+                      checkUserKeyboard(e);
                       setText(e.target.value);
                       setFullText(e.target.value);
                     }}
@@ -307,7 +314,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
           </ModalFooter>
         </>
       ) : (
-        <div className={noPadding ? '' : 'px-4'}>
+        <div className={`${noPadding ? '' : 'px-4'} ${!showOnClick ? 'py-3' : ''}`}>
           <div className="flex gap-1">
             <div className="relative w-[44px] h-[44px] flex-shrink-0">
               <Image
@@ -323,6 +330,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                 <Textarea
                   variant="bordered"
                   size="lg"
+                  dir={isPersianKeyboard ? 'rtl' : 'ltr'}
                   placeholder={(type === 'reply' || replyTo) ? 'Post your reply' : 'What\'s happening?!'}
                   classNames={{
                     input: "text-xl max-[380px]:text-lg placeholder:text-default-400",
@@ -330,6 +338,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                   }}
                   value={text}
                   onChange={(e) => {
+                    checkUserKeyboard(e);
                     setText(e.target.value);
                     setFullText(e.target.value);
                   }}
@@ -365,7 +374,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                 </div>
               )}
               {(!showOnClick || (showOnClick && showFull)) && (
-                <div className={`flex items-center justify-between sticky bottom-0 left-0 w-full gap-3 bg-background ${showOnClick && showFull ? 'pt-3' : 'py-3'}`}>
+                <div className={`flex items-center justify-between sticky bottom-0 left-0 w-full gap-3 bg-background ${showOnClick && showFull ? 'mt-3' : ''}`}>
                   <div className="flex max-[400px]:-ml-12 items-center gap-0.5">
                     {options.map((opt, idx) => (
                       <Button onClick={() => handleOptionClick(opt.type)} key={idx} isIconOnly size="sm" variant="light" radius="full" color="primary" isDisabled={!opt.type}>
@@ -393,6 +402,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
                 </div>
               )}
             </div>
+            {error && <Alert>{error}</Alert>}
           </div>
         </div>
       )}
@@ -403,7 +413,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
         onChange={handleFileUpload}
         hidden
       />
-      {/* <Modal
+      <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         placement="top"
@@ -444,8 +454,9 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
               )}
             </div>
           </ModalBody>
+          {error && <Alert>{error}</Alert>}
         </ModalContent>
-      </Modal> */}
+      </Modal>
     </>
   )
 }
