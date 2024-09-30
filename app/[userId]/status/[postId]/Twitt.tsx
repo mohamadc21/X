@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { follow, increaseTwittView, likeTwitt, unFollow } from "@/app/lib/actions";
+import React, { Key, useTransition } from 'react';
+import { deleteTwitt, follow, increaseTwittView, likeTwitt, unFollow } from "@/app/lib/actions";
 import { ITwitt, SessionUser, UserFollowingsAndFollowers } from "@/app/lib/definitions";
 import { useAppDispatch } from "@/app/lib/hooks";
 import { setReplyTo } from "@/app/lib/slices/appSlice";
@@ -15,6 +15,9 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import TwittSettings from '@/app/ui/TwittSettings';
+import { useSWRConfig } from 'swr';
+import DeleteConfirm from '@/app/ui/DeleteConfirm';
 
 const numeral = require('numeral');
 
@@ -25,6 +28,9 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
     width: 1,
     height: 1
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const { mutate } = useSWRConfig();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -53,11 +59,28 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
     await unFollow(sessionUser?.id!, twitt.id);
   }
 
+  function handleMenuAction(key: Key) {
+    if (key === 'delete') {
+      setShowDeleteConfirm(true);
+    }
+  }
+
+  async function handleTwittDelete() {
+    startTransition(async () => {
+      await deleteTwitt(twitt.id);
+      mutate('/api/twitts');
+      mutate('/api/twitts/comments');
+      mutate('/api/user/twitts');
+      setShowDeleteConfirm(false);
+    });
+  }
+
   useEffect(() => {
     setTwitt(data);
   }, [data]);
 
   useEffect(() => {
+    handleIncreaseView();
     return () => {
       dispatch(setReplyTo(null));
     }
@@ -69,93 +92,101 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
 
 
   return (
-    <div className="flex flex-col gap-3 px-4 border-b border-b-default pb-5">
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2 items-center">
-          <Card isPressable className="h-[45px] w-[45px] min-w-max rounded-full relative" onClick={() => router.push(`/${twitt.username}`)}>
-            <Image fill src={twitt.user_profile} className="object-cover" alt={twitt.name} />
-          </Card>
+    <>
+      <div className="flex flex-col gap-3 px-4 border-b border-b-default pb-5">
+        <div className="flex items-center justify-between">
+          <div className='flex items-center justify-between'>
+            <div className="flex gap-2 items-center">
+              <Card isPressable className="h-[45px] w-[45px] min-w-max rounded-full relative" onClick={() => router.push(`/${twitt.username}`)}>
+                <Image fill src={twitt.user_profile} className="object-cover" alt={twitt.name} />
+              </Card>
+              <div>
+                <h2 className="font-bold leading-5">{twitt.name}</h2>
+                <p className="text-default-400 text-[15px]">@{twitt.username}</p>
+              </div>
+            </div>
+            <TwittSettings twitt={twitt} user={sessionUser} onMenuAction={handleMenuAction} />
+          </div>
           <div>
-            <h2 className="font-bold leading-5">{twitt.name}</h2>
-            <p className="text-default-400 text-[15px]">@{twitt.username}</p>
+            {twitt.user_id !== sessionUser?.id && (
+              <>
+                {twitt.follows.followers.some(follower => follower == sessionUser?.id! as number) ? (
+                  <Button variant="bordered" className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger" radius="full" onPointerEnter={() => setFollowingText("Unfollow")} onPointerLeave={() => setFollowingText("Following")} onClick={hanldeUnfollow}>
+                    {followingText}
+                  </Button>
+                ) : (
+                  <Button onClick={hanldeFollow} color="secondary" className="font-bold text-base" radius="full">
+                    Follow
+                  </Button>
+                )}
+              </>
+            )}
           </div>
         </div>
-        <div>
-          {twitt.user_id !== sessionUser?.id && (
-            <>
-              {twitt.follows.followers.some(follower => follower == sessionUser?.id! as number) ? (
-                <Button variant="bordered" className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger" radius="full" onPointerEnter={() => setFollowingText("Unfollow")} onPointerLeave={() => setFollowingText("Following")} onClick={hanldeUnfollow}>
-                  {followingText}
-                </Button>
-              ) : (
-                <Button onClick={hanldeFollow} color="secondary" className="font-bold text-base" radius="full">
-                  Follow
-                </Button>
-              )}
-            </>
-          )}
+
+        {twitt.text && (
+          <p
+            className="whitespace-pre-wrap leading-5 break-words to-twitt text-lg"
+            dir={/[\u0600-\u06FF]/.test(twitt.text) ? 'rtl' : 'ltr'}
+            dangerouslySetInnerHTML={{ __html: twitt.text }}
+          />
+        )}
+        {twitt.media && twitt.media_type === 'image' && (
+          <Image
+            src={twitt.media}
+            layout="responsive"
+            objectFit="contain"
+            alt="twitt image"
+            priority={true}
+            className="mt-4 rounded-2xl to-twitt"
+            onLoad={target => {
+              setSmageSize({
+                width: target.currentTarget.naturalWidth,
+                height: target.currentTarget.naturalHeight
+              });
+            }}
+            width={imageSize.width}
+            height={imageSize.height}
+          />
+        )}
+        {twitt.media && twitt.media_type === 'gif' && (
+          <img
+            src={twitt.media}
+            alt="twitt image"
+            className="w-full mt-4 rounded-2xl to-twitt"
+          />
+        )}
+        {twitt.media && twitt.media_type === 'video' && (
+          <MediaPlayer src={twitt.media} className="mt-4">
+            <MediaProvider />
+            <DefaultVideoLayout icons={defaultLayoutIcons} />
+          </MediaPlayer>
+        )}
+        <ul className="flex items-center text-default-400">
+          <li>{format(twitt.created_at.toISOString(), 'p')}</li>
+          <span className="px-1">-</span>
+          <li>{format(twitt.created_at.toISOString(), 'PP')}</li>
+          <span className="px-1">-</span>
+          <li><span className="text-foreground">{numeral(twitt.views.length).format('0a')}</span> Views</li>
+        </ul>
+        <TwittActions
+          twitt={twitt}
+          user={sessionUser}
+          onCommentsClick={() => {
+            dispatch(setReplyTo(twitt))
+            router.push('/post');
+          }}
+          onLike={handleTwittLike}
+          className="border-y border-y-default py-2"
+        />
+        <div className="mt-2">
+          <CreatePost type="reply" noPadding user={sessionUser} rows={1} showOnClick />
         </div>
       </div>
-
-      {twitt.text && (
-        <p
-          className="whitespace-pre-wrap leading-5 break-words to-twitt text-lg"
-          dir={/[\u0600-\u06FF]/.test(twitt.text) ? 'rtl' : 'ltr'}
-          dangerouslySetInnerHTML={{ __html: twitt.text }}
-        />
+      {showDeleteConfirm && (
+        <DeleteConfirm desc="This can’t be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results. " action={handleTwittDelete} pending={pending}>Delete Post?</DeleteConfirm>
       )}
-      {twitt.media && twitt.media_type === 'image' && (
-        <Image
-          src={twitt.media}
-          layout="responsive"
-          objectFit="contain"
-          alt="twitt image"
-          priority={true}
-          className="mt-4 rounded-2xl to-twitt"
-          onLoad={target => {
-            setSmageSize({
-              width: target.currentTarget.naturalWidth,
-              height: target.currentTarget.naturalHeight
-            });
-          }}
-          width={imageSize.width}
-          height={imageSize.height}
-        />
-      )}
-      {twitt.media && twitt.media_type === 'gif' && (
-        <img
-          src={twitt.media}
-          alt="twitt image"
-          className="w-full mt-4 rounded-2xl to-twitt"
-        />
-      )}
-      {twitt.media && twitt.media_type === 'video' && (
-        <MediaPlayer src={twitt.media} className="mt-4">
-          <MediaProvider />
-          <DefaultVideoLayout icons={defaultLayoutIcons} />
-        </MediaPlayer>
-      )}
-      <ul className="flex items-center text-default-400">
-        <li>{format(twitt.created_at.toISOString(), 'p')}</li>
-        <span className="px-1">-</span>
-        <li>{format(twitt.created_at.toISOString(), 'PP')}</li>
-        <span className="px-1">-</span>
-        <li><span className="text-foreground">{numeral(twitt.views.length).format('0a')}</span> Views</li>
-      </ul>
-      <TwittActions
-        twitt={twitt}
-        user={sessionUser}
-        onCommentsClick={() => {
-          dispatch(setReplyTo(twitt))
-          router.push('/post');
-        }}
-        onLike={handleTwittLike}
-        className="border-y border-y-default py-2"
-      />
-      <div className="mt-2">
-        <CreatePost type="reply" noPadding user={sessionUser} rows={1} showOnClick />
-      </div>
-    </div>
+    </>
   )
 }
 

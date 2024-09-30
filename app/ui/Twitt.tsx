@@ -12,25 +12,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { Key, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
-import TwittActions from "./TwittActions";
-import { HiOutlineDotsHorizontal, HiOutlineDotsVertical } from "react-icons/hi";
-import { Button } from "@nextui-org/button";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@nextui-org/react";
-import { GoTrash } from "react-icons/go";
-import { MdOutlinePushPin } from "react-icons/md";
-import { BsStars } from "react-icons/bs";
-import { RiPagesLine } from "react-icons/ri";
-import { FaRegComment, FaUserPlus } from "react-icons/fa";
-import { MdBlock } from "react-icons/md";
-import { LuUserPlus } from "react-icons/lu";
-import DeleteConfirm from "./DeleteConfirm";
 import { useSWRConfig } from "swr";
-const numeral = require("numeral");
+import DeleteConfirm from "./DeleteConfirm";
+import TwittActions from "./TwittActions";
+import TwittSettings from "./TwittSettings";
 
 export const ActionTypes = {
   INCREASE_VIEW: "INCREASE_VIEW",
@@ -230,72 +215,7 @@ function Twitt({
                     {format(new Date(twitt.created_at).toISOString(), "MMM d")}
                   </p>
                 </div>
-                <Dropdown className="bg-background">
-                  <DropdownTrigger>
-                    <Button
-                      variant="light"
-                      color="primary"
-                      isIconOnly
-                      size="sm"
-                      radius="full"
-                      startContent={
-                        <HiOutlineDotsHorizontal
-                          size="18"
-                          className="text-default-400 group-hover:text-primary"
-                        />
-                      }
-                    ></Button>
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    variant="shadow"
-                    style={{
-                      boxShadow: "0 0 8px hsl(var(--nextui-default-400))",
-                    }}
-                    className="rounded-2xl overflow-hidden bg-background p-0"
-                    itemClasses={{
-                      base: "bg-background border-none text-lg hover:bg-default/20 p-3 w-full",
-                      title: "text-base font-bold",
-                    }}
-                    onAction={handleMenuAction}
-                  >
-                    <DropdownItem
-                      className="text-red-500"
-                      key="delete"
-                      hidden={twitt.user_id != user.id}
-                      startContent={<GoTrash />}
-                    >
-                      Delete
-                    </DropdownItem>
-                    <DropdownItem key="follow" hidden={twitt.user_id == user.id} startContent={<LuUserPlus />}>
-                      Follow @{twitt.username}
-                    </DropdownItem>
-                    <DropdownItem key="block" hidden={twitt.user_id == user.id} startContent={<MdBlock />}>
-                      Block @{twitt.username}
-                    </DropdownItem>
-                    <DropdownItem
-                      key="pin"
-                      startContent={<MdOutlinePushPin />}
-                    >
-                      Pin to your profile
-                    </DropdownItem>
-                    <DropdownItem key="highlight" startContent={<BsStars />}>
-                      Highlight on your profile
-                    </DropdownItem>
-                    <DropdownItem
-                      key="add-remove"
-                      startContent={<RiPagesLine />}
-                    >
-                      Add/remove @{twitt.username} from Lists
-                    </DropdownItem>
-                    <DropdownItem
-                      hidden={twitt.user_id != user.id}
-                      key="change-reply"
-                      startContent={<FaRegComment />}
-                    >
-                      Change who can reply
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
+                <TwittSettings user={user} twitt={twitt} onMenuAction={(key) => handleMenuAction(key)} />
               </div>
               {twitt.text && (
                 <p
