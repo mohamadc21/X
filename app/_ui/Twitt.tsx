@@ -192,7 +192,8 @@ function Twitt({
           style={{ gridTemplateColumns: "45px 1fr" }}
         >
           <Link
-            href={`/${user.username}`}
+            href={`/${twitt.username}`}
+            className="w-[45px] h-[45px]"
           >
             <img
               className="sm:block hidden w-[45px] h-[45px] rounded-full flex-shrink-0 object-cover"

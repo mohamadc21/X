@@ -18,6 +18,7 @@ import TwittSettings from '@/app/_ui/TwittSettings';
 import { useSWRConfig } from 'swr';
 import DeleteConfirm from '@/app/_ui/DeleteConfirm';
 import Alert from '@/app/_ui/Alert';
+import Link from 'next/link';
 
 const numeral = require('numeral');
 
@@ -103,9 +104,16 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
         <div className="flex items-center justify-between">
           <div className='flex items-center justify-between w-full'>
             <div className="flex gap-2 items-center">
-              <Card isPressable className="h-[45px] w-[45px] min-w-max rounded-full" onClick={() => router.push(`/${twitt.username}`)}>
-                <img src={twitt.user_profile} className="object-cover h-[45px] w-[45px]" alt={twitt.name} />
-              </Card>
+              <Link
+                href={`/${twitt.username}`}
+                className="w-[45px] h-[45px]"
+              >
+                <img
+                  className="sm:block hidden w-[45px] h-[45px] rounded-full flex-shrink-0 object-cover"
+                  src={twitt.user_profile}
+                  alt={twitt.name!}
+                />
+              </Link>
               <div>
                 <h2 className="font-bold leading-5">{twitt.name}</h2>
                 <p className="text-default-400 text-[15px]">@{twitt.username}</p>
