@@ -13,10 +13,10 @@ async function Page() {
   const session = await auth();
   if (!session) redirect('/i/flow/login');
   return (
-    <div className="flex-1 w-full max-w-2xl">
+    <>
       <Header user={session?.user} />
       <TwittsWrapper session={session} />
-    </div>
+    </>
   )
 }
 
