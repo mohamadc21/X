@@ -16,6 +16,7 @@ import DeleteConfirm from "./DeleteConfirm";
 import TwittActions from "./TwittActions";
 import TwittSettings from "./TwittSettings";
 import Alert from "./Alert";
+import LoadingSpinner from "./LoadingSpinner";
 
 export const ActionTypes = {
   INCREASE_VIEW: "INCREASE_VIEW",
@@ -41,8 +42,8 @@ function Twitt({
     { type: string; payload: any }
   >(initialTwitt, twittReducer);
   const [imageSize, setSmageSize] = useState({
-    width: 1,
-    height: 1,
+    width: 0,
+    height: 0,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [message, setMessage] = useState('');
@@ -234,19 +235,26 @@ function Twitt({
                 />
               )}
               {twitt.media && ['image', 'gif'].includes(twitt.media_type ?? '') && (
-                <img
-                  src={twitt.media}
-                  alt={twitt.text}
-                  className="mt-4 rounded-2xl to-twitt"
-                  onLoad={(target) => {
-                    setSmageSize({
-                      width: target.currentTarget.naturalWidth,
-                      height: target.currentTarget.naturalHeight,
-                    });
-                  }}
-                  width={imageSize.width}
-                  height={imageSize.height}
-                />
+                <>
+                  <img
+                    src={twitt.media}
+                    alt={twitt.text}
+                    className={`${imageSize.width ? '' : 'hidden'} mt-4`}
+                    onLoad={(target) => {
+                      setSmageSize({
+                        width: target.currentTarget.naturalWidth,
+                        height: target.currentTarget.naturalHeight,
+                      });
+                    }}
+                    width={imageSize.width}
+                    height={imageSize.height}
+                  />
+                  {!imageSize.width && (
+                    <div className="w-full h-[150px] flex items-center justify-center">
+                      <LoadingSpinner noPadding />
+                    </div>
+                  )}
+                </>
               )}
               {twitt.media && twitt.media_type === "video" && (
                 <MediaPlayer src={twitt.media} className="mt-4">

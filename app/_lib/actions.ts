@@ -87,14 +87,21 @@ export async function getUserFollowersAndFollowings(user_id: number | string): P
 
 export async function deleteTwitt(twitt_id: number | string) {
   const twitt = await query<ITwitt[]>("select * from twitts where id = ?", [twitt_id]);
+  async function deleteComments() {
+    twitt[0].comments.forEach(async (comment) => {
+      await query("delete from twitts where id = ?", [comment]);
+    })
+  }
   if (twitt[0].reply_to) {
+    const replyedtoTwitt = await query<{ comments: number[] }[]>("select comments from twitts where id = ?", [twitt[0].reply_to]);
     await Promise.all([
-      query("delete from twitts where id = ? ; update twitts set comments = comments - 1 where id = ?", [twitt_id, twitt_id]),
+      query("delete from twitts where id = ?", [twitt_id]),
+      query("update twitts set comments = ? where id = ?", [`"${replyedtoTwitt[0].comments.filter(comment => comment != twitt_id)}"`, twitt[0].reply_to]),
+      twitt[0].comments.length ? deleteComments() : null
     ]);
   } else {
     await query("delete from twitts where id = ?", [twitt_id]);
   }
-  revalidatePath('/', 'layout');
 }
 
 export async function signinWithGoogle() {
@@ -439,11 +446,10 @@ export async function addTwitt({ userId, text, formData, gif, replyTo }: AddTwit
   }
 
   try {
-    await Promise.all([
-      query<ResultSetHeader>(`insert into twitts (${fields}) values (${values})`, params),
-      replyTo ? query("update twitts set comments = json_array_append(comments, '$', ?) where id = ?", [replyTo?.toString(), replyTo]) : null
-    ]
-    );
+    const result = await query<ResultSetHeader>(`insert into twitts (${fields}) values (${values})`, params);
+    if (replyTo) {
+      await query("update twitts set comments = json_array_append(comments, '$', ?) where id = ?", [result.insertId.toString(), replyTo]);
+    }
     revalidatePath('/home');
   } catch (err) {
     console.error(err);
@@ -454,6 +460,8 @@ export async function addTwitt({ userId, text, formData, gif, replyTo }: AddTwit
 export async function increaseTwittView(twitt_id: number | string, user_id: number | string) {
 
   const result = await query<{ views: number[] }[]>("select views from twitts where id = ?", [twitt_id]);
+
+  if (result.length < 1) return;
 
   const views = result[0].views;
 

@@ -15,7 +15,7 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import TwittSettings from '@/app/_ui/TwittSettings';
-import { useSWRConfig } from 'swr';
+import useSWR, { SWRConfig, useSWRConfig } from 'swr';
 import DeleteConfirm from '@/app/_ui/DeleteConfirm';
 import Alert from '@/app/_ui/Alert';
 import Link from 'next/link';
@@ -32,9 +32,18 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [message, setMessage] = useState('');
   const [pending, startTransition] = useTransition();
-  const { mutate } = useSWRConfig();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { mutate } = useSWRConfig();
+  useSWR(`/api/twitt`, async () => {
+    const resp = await fetch(`/api/twitts/${twitt.id}`);
+    const data = await resp.json();
+    if (data) {
+      setTwitt(data);
+    }
+  }, {
+    refreshInterval: 5000
+  });
 
   async function handleIncreaseView() {
     setTwitt(prev => ({
@@ -76,9 +85,7 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
   async function handleTwittDelete() {
     startTransition(async () => {
       await deleteTwitt(twitt.id);
-      mutate('/api/twitts');
-      mutate('/api/twitts/comments');
-      mutate('/api/user/twitts');
+      mutate(`/api/twitt`);
       setShowDeleteConfirm(false);
     });
   }
@@ -88,7 +95,9 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
   }, [data]);
 
   useEffect(() => {
-    handleIncreaseView();
+    if (!twitt.views.includes(sessionUser.id as number)) {
+      handleIncreaseView();
+    }
     return () => {
       dispatch(setReplyTo(null));
     }
@@ -167,9 +176,9 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
           </MediaPlayer>
         )}
         <ul className="flex items-center text-default-400">
-          <li>{format(twitt.created_at.toISOString(), 'p')}</li>
+          <li>{format(twitt.created_at, 'p')}</li>
           <span className="px-1">-</span>
-          <li>{format(twitt.created_at.toISOString(), 'PP')}</li>
+          <li>{format(twitt.created_at, 'PP')}</li>
           <span className="px-1">-</span>
           <li><span className="text-foreground">{numeral(twitt.views.length).format('0a')}</span> Views</li>
         </ul>

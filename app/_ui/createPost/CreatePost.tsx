@@ -98,6 +98,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
         return setError(error.message);
       }
       mutate('/api/twitts');
+      mutate('/api/twitt');
       mutate('/api/twitts/comments');
       mutate('/api/user/twitts');
       setText('');
@@ -316,7 +317,10 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
               className="w-[44px] h-[44px] flex-shrink-0 rounded-full object-cover"
             />
             <div className="w-full relative">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between"
+                onClick={() => {
+                  showOnClick ? setShowFull(true) : null
+                }}>
                 <Textarea
                   variant="bordered"
                   size="lg"
