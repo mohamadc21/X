@@ -1,8 +1,8 @@
 "use client";
 
-import { useAppSelector, useModalProps } from "@/app/lib/hooks";
-import LoadingSpinner from "@/app/ui/LoadingSpinner";
-import Logo from "@/app/ui/Logo";
+import { useAppSelector, useModalProps } from "@/app/_lib/hooks";
+import LoadingSpinner from "@/app/_ui/LoadingSpinner";
+import Logo from "@/app/_ui/Logo";
 import { Modal, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/modal";
 import { useRouter } from "next/navigation";
 import { useEffect, useTransition } from "react";
@@ -30,7 +30,7 @@ function LoginFlow() {
       onOpenChange={(isOpen) => {
         if (!isOpen) router.back();
       }}
-      {...modalProps({ className: "min-h-[90dvh] overflow-hidden", size: "xl", centerContent: true })}
+      {...modalProps({ className: "min-h-[90dvh]", size: "xl", centerContent: true })}
     >
       <ModalContent>
         <ModalHeader className="mx-auto">

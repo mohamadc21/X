@@ -1,11 +1,11 @@
-import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/_lib/hooks";
 import { Button, Input, ModalBody, ModalFooter } from "@nextui-org/react";
 import Link from "next/link";
 import React, { SyntheticEvent, useRef, useState } from "react";
-import Alert from "@/app/ui/Alert";
-import { signinWithCredentials } from "@/app/lib/actions";
+import Alert from "@/app/_ui/Alert";
+import { signinWithCredentials } from "@/app/_lib/actions";
 import { useRouter } from "next/navigation";
-import { setLoginData } from "@/app/lib/slices/userSlice";
+import { setLoginData } from "@/app/_lib/slices/userSlice";
 
 function Step2({ onTransition }: { onTransition: (callback: () => Promise<any>) => void }) {
   const [password, setPassword] = useState<string>('');
@@ -55,7 +55,7 @@ function Step2({ onTransition }: { onTransition: (callback: () => Promise<any>) 
                 size="lg"
                 variant="bordered"
                 color="primary"
-                label="password"
+                label="Password"
                 className="mb-1.5"
                 radius="sm"
                 autoFocus

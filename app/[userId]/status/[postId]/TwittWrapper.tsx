@@ -1,9 +1,9 @@
-import { getTwittById, getUserFollowersAndFollowings } from "@/app/lib/actions";
+import { getTwittById, getUserFollowersAndFollowings } from "@/app/_lib/actions";
 import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
 import Twitt from "./Twitt";
-import { auth } from "@/app/lib/auth";
-import LoadingSpinner from "@/app/ui/LoadingSpinner";
+import { auth } from "@/app/_lib/auth";
+import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import TwittCommentsWrapper from "./TwittCommentsWrapper";
 
 async function TwittWrapper({ postId }: { postId: string }) {

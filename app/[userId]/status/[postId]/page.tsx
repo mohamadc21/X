@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import TwittWrapper from "./TwittWrapper";
 import TwittHeader from "./TwittHeader";
-import LoadingSpinner from "@/app/ui/LoadingSpinner";
+import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 
 function Page({ params }: { params: { postId: string } }) {
   return (

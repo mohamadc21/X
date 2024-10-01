@@ -1,6 +1,6 @@
-import { getTwittComments } from "@/app/lib/actions";
-import { auth } from "@/app/lib/auth";
-import TwittsList from "@/app/ui/TwittsList";
+import { getTwittComments } from "@/app/_lib/actions";
+import { auth } from "@/app/_lib/auth";
+import TwittsList from "@/app/_ui/TwittsList";
 import React from "react";
 
 async function TwittCommentsWrapper({ postId }: { postId: string }) {

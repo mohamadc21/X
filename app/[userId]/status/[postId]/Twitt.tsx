@@ -1,23 +1,23 @@
 "use client";
 
 import React, { Key, useTransition } from 'react';
-import { deleteTwitt, follow, increaseTwittView, likeTwitt, unFollow } from "@/app/lib/actions";
-import { ITwitt, SessionUser, UserFollowingsAndFollowers } from "@/app/lib/definitions";
-import { useAppDispatch } from "@/app/lib/hooks";
-import { setReplyTo } from "@/app/lib/slices/appSlice";
-import CreatePost from "@/app/ui/createPost/CreatePost";
-import { ActionTypes } from "@/app/ui/Twitt";
-import TwittActions from "@/app/ui/TwittActions";
+import { deleteTwitt, follow, increaseTwittView, likeTwitt, unFollow } from "@/app/_lib/actions";
+import { ITwitt, SessionUser, UserFollowingsAndFollowers } from "@/app/_lib/definitions";
+import { useAppDispatch } from "@/app/_lib/hooks";
+import { setReplyTo } from "@/app/_lib/slices/appSlice";
+import CreatePost from "@/app/_ui/createPost/CreatePost";
+import { ActionTypes } from "@/app/_ui/Twitt";
+import TwittActions from "@/app/_ui/TwittActions";
 import { Button, Card } from "@nextui-org/react";
 import { MediaPlayer, MediaProvider } from '@vidstack/react';
 import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
 import { format } from "date-fns";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import TwittSettings from '@/app/ui/TwittSettings';
+import TwittSettings from '@/app/_ui/TwittSettings';
 import { useSWRConfig } from 'swr';
-import DeleteConfirm from '@/app/ui/DeleteConfirm';
+import DeleteConfirm from '@/app/_ui/DeleteConfirm';
+import Alert from '@/app/_ui/Alert';
 
 const numeral = require('numeral');
 
@@ -29,6 +29,7 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
     height: 1
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [message, setMessage] = useState('');
   const [pending, startTransition] = useTransition();
   const { mutate } = useSWRConfig();
   const router = useRouter();
@@ -59,9 +60,15 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
     await unFollow(sessionUser?.id!, twitt.id);
   }
 
-  function handleMenuAction(key: Key) {
+  async function handleMenuAction(key: Key) {
+    setMessage('');
     if (key === 'delete') {
       setShowDeleteConfirm(true);
+    } else if (key === 'follow') {
+      await follow(sessionUser.id, twitt.user_id);
+      setMessage(`You're now following @${twitt.username}`)
+    } else {
+      setMessage('This option is not available for now.');
     }
   }
 
@@ -84,21 +91,20 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
     return () => {
       dispatch(setReplyTo(null));
     }
-  });
+  }, []);
 
   useEffect(() => {
     dispatch(setReplyTo(twitt));
   }, [twitt]);
 
-
   return (
     <>
       <div className="flex flex-col gap-3 px-4 border-b border-b-default pb-5">
         <div className="flex items-center justify-between">
-          <div className='flex items-center justify-between'>
+          <div className='flex items-center justify-between w-full'>
             <div className="flex gap-2 items-center">
-              <Card isPressable className="h-[45px] w-[45px] min-w-max rounded-full relative" onClick={() => router.push(`/${twitt.username}`)}>
-                <Image fill src={twitt.user_profile} className="object-cover" alt={twitt.name} />
+              <Card isPressable className="h-[45px] w-[45px] min-w-max rounded-full" onClick={() => router.push(`/${twitt.username}`)}>
+                <img src={twitt.user_profile} className="object-cover h-[45px] w-[45px]" alt={twitt.name} />
               </Card>
               <div>
                 <h2 className="font-bold leading-5">{twitt.name}</h2>
@@ -131,14 +137,11 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
             dangerouslySetInnerHTML={{ __html: twitt.text }}
           />
         )}
-        {twitt.media && twitt.media_type === 'image' && (
-          <Image
+        {twitt.media && ['image', 'gif'].includes(twitt.media_type ?? '') && (
+          <img
             src={twitt.media}
-            layout="responsive"
-            objectFit="contain"
             alt="twitt image"
-            priority={true}
-            className="mt-4 rounded-2xl to-twitt"
+            className="mt-4 rounded-2xl to-twitt object-cover"
             onLoad={target => {
               setSmageSize({
                 width: target.currentTarget.naturalWidth,
@@ -147,13 +150,6 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
             }}
             width={imageSize.width}
             height={imageSize.height}
-          />
-        )}
-        {twitt.media && twitt.media_type === 'gif' && (
-          <img
-            src={twitt.media}
-            alt="twitt image"
-            className="w-full mt-4 rounded-2xl to-twitt"
           />
         )}
         {twitt.media && twitt.media_type === 'video' && (
@@ -182,6 +178,7 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
         <div className="mt-2">
           <CreatePost type="reply" noPadding user={sessionUser} rows={1} showOnClick />
         </div>
+        {message && <Alert type="fixed">{message}</Alert>}
       </div>
       {showDeleteConfirm && (
         <DeleteConfirm desc="This can’t be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results. " action={handleTwittDelete} pending={pending}>Delete Post?</DeleteConfirm>

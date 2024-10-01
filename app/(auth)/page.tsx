@@ -1,4 +1,4 @@
-import { auth } from "@/app/lib/auth";
+import { auth } from "@/app/_lib/auth";
 import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata | void> {

@@ -1,12 +1,12 @@
 "use client";
-import Logo from "@/app/ui/Logo";
+import Logo from "@/app/_ui/Logo";
 import { Button } from "@nextui-org/button";
 import React from "react";
-import OAuthButton from "@/app/ui/OAuthButton";
+import OAuthButton from "@/app/_ui/OAuthButton";
 import { AppleFilled } from "@ant-design/icons";
-import GoogleIcon from "@/app/ui/GoogleIcon";
+import GoogleIcon from "@/app/_ui/GoogleIcon";
 import Link from "next/link";
-import { signinWithGoogle } from "@/app/lib/actions";
+import { signinWithGoogle } from "@/app/_lib/actions";
 import { useRouter } from "next/navigation";
 
 function SignupForm() {

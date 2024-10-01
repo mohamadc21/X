@@ -1,17 +1,17 @@
 import { ModalBody, ModalFooter, ModalHeader } from "@nextui-org/modal";
 import React, { useRef } from "react";
-import Logo from "@/app/ui/Logo";
+import Logo from "@/app/_ui/Logo";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/react";
 import Link from "next/link";
-import { useAppSelector } from "@/app/lib/hooks";
-import { signupWithCredentials } from "@/app/lib/actions";
-import { PasswordData, PasswordScheme } from "@/app/lib/definitions";
+import { useAppSelector } from "@/app/_lib/hooks";
+import { signupWithCredentials } from "@/app/_lib/actions";
+import { PasswordData, PasswordScheme } from "@/app/_lib/definitions";
 import { useDispatch } from "react-redux";
-import Alert from "@/app/ui/Alert";
-import { setSignupData } from "@/app/lib/slices/userSlice";
+import Alert from "@/app/_ui/Alert";
+import { setSignupData } from "@/app/_lib/slices/userSlice";
 import { useSession } from "next-auth/react";
 
 

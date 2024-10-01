@@ -1,11 +1,11 @@
 import { ModalBody, ModalFooter, ModalHeader } from "@nextui-org/modal";
 import React, { ChangeEvent, useState } from "react";
-import Logo from "@/app/ui/Logo";
+import Logo from "@/app/_ui/Logo";
 import { Avatar, Button } from "@nextui-org/react";
 import { CameraOutlined } from "@ant-design/icons";
-import { uploadProfile } from "@/app/lib/actions";
-import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
-import { setSignupData } from "@/app/lib/slices/userSlice";
+import { uploadProfile } from "@/app/_lib/actions";
+import { useAppDispatch, useAppSelector } from "@/app/_lib/hooks";
+import { setSignupData } from "@/app/_lib/slices/userSlice";
 import { useSession } from "next-auth/react";
 
 function Step4({ onTransition }: { onTransition: (callback: () => Promise<any>) => void }) {
@@ -44,7 +44,7 @@ function Step4({ onTransition }: { onTransition: (callback: () => Promise<any>) 
           <div className="relative w-[200px] h-[200px] mt-12 mx-auto">
             <Button color={error ? 'danger' : undefined} isIconOnly radius="full" className={`w-full h-full text-foreground ${error ? '' : 'bg-transparent'}`}>
               <label className="cursor-pointer" htmlFor="upload">
-                <Avatar src="/default_pic.jpg" className="w-full h-full border-2 border-gray-500 z-0 relative" />
+                <Avatar src="/images/default_pic.jpg" className="w-full h-full border-2 border-gray-500 z-0 relative" />
                 <div className="absolute top-1/2 left-1/2 -translate-y-[70%] -translate-x-1/2 text-xl z-20 bg-gray-900 h-10 w-10 flex items-center justify-center rounded-full">
                   <CameraOutlined />
                 </div>

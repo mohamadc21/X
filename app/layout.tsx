@@ -1,11 +1,11 @@
-import "@/app/styles/globals.css";
+import "@/app/_styles/globals.css";
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/video.css';
-import chirp from "@/app/ui/fonts/chirp";
-import Providers from "@/app/ui/providers/providers";
+import chirp from "@/app/_ui/fonts/chirp";
+import Providers from "@/app/_ui/providers/providers";
 import type { Metadata } from "next";
-import { auth } from "./lib/auth";
-import SidebarWrapper from "./ui/SidebarWrapper";
+import { auth } from "./_lib/auth";
+import SidebarWrapper from "./_ui/SidebarWrapper";
 import NextTopLoader from 'nextjs-toploader';
 
 export const metadata: Metadata = {
@@ -34,10 +34,8 @@ export default async function RootLayout({
             {/* <header></header> */}
             <main className="flex-1 flex flex-col justify-center sm:flex-row">
               {session && <SidebarWrapper />}
-              <div className="flex-1 lg:max-w-full w-full max-w-[600px]">
-                {children}
-              </div>
-              {session && <div className="max-w-[380px] px-6 flex-1 lg:block hidden" />}
+              {children}
+              {/* right section {session && <div className="max-w-[380px] px-6 flex-1 lg:block hidden" />} */}
             </main>
           </div>
         </Providers>

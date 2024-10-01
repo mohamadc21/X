@@ -1,16 +1,16 @@
 import { ModalBody, ModalFooter, ModalHeader } from "@nextui-org/modal";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import Logo from "@/app/ui/Logo";
+import Logo from "@/app/_ui/Logo";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/react";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircleFilled, ExclamationCircleFilled } from "@ant-design/icons";
-import { updateUsername, usernameIsUnique } from "@/app/lib/actions";
-import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
-import Alert from "@/app/ui/Alert";
-import { setSignupData } from "@/app/lib/slices/userSlice";
+import { updateUsername, usernameIsUnique } from "@/app/_lib/actions";
+import { useAppDispatch, useAppSelector } from "@/app/_lib/hooks";
+import Alert from "@/app/_ui/Alert";
+import { setSignupData } from "@/app/_lib/slices/userSlice";
 import { useSession } from "next-auth/react";
 
 interface Username {

@@ -1,7 +1,7 @@
 import React from "react";
 import CredentialsFlow from "@/app/(auth)/i/flow/signup/credentials/CredentailsFlow";
 import { Metadata } from "next";
-import { auth } from "@/app/lib/auth";
+import { auth } from "@/app/_lib/auth";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {

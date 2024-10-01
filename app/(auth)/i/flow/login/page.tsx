@@ -1,4 +1,4 @@
-import { auth } from "@/app/lib/auth";
+import { auth } from "@/app/_lib/auth";
 import LoginFlow from "@/app/(auth)/i/flow/login/LoginFlow";
 import { redirect } from "next/navigation";
 

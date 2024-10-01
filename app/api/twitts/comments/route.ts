@@ -1,4 +1,4 @@
-import { getAlltwitts, getTwittComments } from "@/app/lib/actions";
+import { getAlltwitts, getTwittComments } from "@/app/_lib/actions";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = 'force-dynamic';

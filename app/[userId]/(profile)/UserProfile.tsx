@@ -4,16 +4,15 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button } from "@nextui-org/button";
 import { Card, Tab, Tabs } from "@nextui-org/react";
 import { format } from "date-fns";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
-import { follow, unFollow } from "@/app/lib/actions";
-import { ITwitt, SessionUser, User, UserFollowingsAndFollowers } from "@/app/lib/definitions";
-import { useAppDispatch } from "@/app/lib/hooks";
+import { follow, unFollow } from "@/app/_lib/actions";
+import { ITwitt, SessionUser, User, UserFollowingsAndFollowers } from "@/app/_lib/definitions";
+import { useAppDispatch } from "@/app/_lib/hooks";
 import { FaLocationDot } from "react-icons/fa6";
-import { setUserData } from "@/app/lib/slices/userSlice";
+import { setUserData } from "@/app/_lib/slices/userSlice";
 import { GrAttachment } from "react-icons/gr";
 import useSWR from "swr";
 
@@ -73,7 +72,7 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
 
   return (
     <div className="sm:border-x border-x-default flex-1 lg:max-w-full max-w-[600px] min-h-[100dvh]">
-      <header className="sticky top-0 left-0 w-full bg-background/40 backdrop-blur-sm flex items-center gap-4 px-2 py-3 z-[3]">
+      <header className="sticky top-0 left-0 w-full bg-background/40 backdrop-blur-lg flex items-center gap-4 px-2 py-3 z-[3]">
         <Button variant="light" className="text-lg" radius="full" isIconOnly onClick={() => router.back()}>
           <ArrowLeftOutlined />
         </Button>
@@ -84,16 +83,16 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
       </header>
       <div>
         {profileDetails.header_photo ? (
-          <Card radius="none" isPressable onClick={() => router.push(`/${profileDetails.username}/header_photo`)} className="w-full h-[200px] relative">
-            <Image fill objectFit="cover" priority={true} src={profileDetails.header_photo!} alt={profileDetails.name} />
+          <Card radius="none" isPressable onClick={() => router.push(`/${profileDetails.username}/header_photo`)} className="w-full h-[200px]">
+            <img src={profileDetails.header_photo!} className="w-full h-full object-cover" alt={profileDetails.name} />
           </Card>
         ) : (
           <div className="h-[200px] bg-default-200" />
         )}
         <div className="px-4 flex justify-between mb-3">
           <div className="flex flex-col -mt-[12%] gap-3">
-            <Card isPressable className="h-[140px] w-[140px] min-w-max rounded-full border-4 border-background relative" onClick={() => router.push(`/${profileDetails.username}/photo`)}>
-              <Image fill src={profileDetails.profile || '/default_white.jpg'} className="object-cover" alt={profileDetails.name} />
+            <Card isPressable className="h-[140px] w-[140px] min-w-max rounded-full border-4 border-background" onClick={() => router.push(`/${profileDetails.username}/photo`)}>
+              <img src={profileDetails.profile} className="object-cover h-[140px] w-[140px]" alt={profileDetails.name} />
             </Card>
             <div>
               <h1 className="text-xl font-bold">{profileDetails.name}</h1>

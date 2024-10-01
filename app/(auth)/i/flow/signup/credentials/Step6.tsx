@@ -1,5 +1,5 @@
-import { useAppDispatch } from "@/app/lib/hooks";
-import { setSignupData } from "@/app/lib/slices/userSlice";
+import { useAppDispatch } from "@/app/_lib/hooks";
+import { setSignupData } from "@/app/_lib/slices/userSlice";
 import { BellOutlined } from "@ant-design/icons";
 import { Button } from "@nextui-org/button";
 import { ModalBody } from "@nextui-org/modal";

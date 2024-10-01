@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
-import PostModal from "@/app/ui/createPost/PostModal";
-import CreatePostWrapper from "@/app/ui/createPost/CreatePostWrapper";
-import LoadingSpinner from "@/app/ui/LoadingSpinner";
+import PostModal from "@/app/_ui/createPost/PostModal";
+import CreatePostWrapper from "@/app/_ui/createPost/CreatePostWrapper";
+import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

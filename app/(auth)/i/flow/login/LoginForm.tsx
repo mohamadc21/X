@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import OAuthButton from "@/app/ui/OAuthButton";
-import GoogleIcon from "@/app/ui/GoogleIcon";
+import OAuthButton from "@/app/_ui/OAuthButton";
+import GoogleIcon from "@/app/_ui/GoogleIcon";
 import { AppleFilled } from "@ant-design/icons";
 import { Button, Input, ModalBody } from "@nextui-org/react";
-import { checkExistsUserByEmailUsername, signinWithGoogle } from "@/app/lib/actions";
-import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
-import { setLoginData } from "@/app/lib/slices/userSlice";
-import Alert from "@/app/ui/Alert";
+import { checkExistsUserByEmailUsername, signinWithGoogle } from "@/app/_lib/actions";
+import { useAppDispatch, useAppSelector } from "@/app/_lib/hooks";
+import { setLoginData } from "@/app/_lib/slices/userSlice";
+import Alert from "@/app/_ui/Alert";
 import { useRouter } from "next/navigation";
 
 export default function LoginForm({ onTransition }: { onTransition: (callback: () => Promise<any>) => void }) {

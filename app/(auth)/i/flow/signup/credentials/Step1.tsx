@@ -1,13 +1,13 @@
-import { sendVerification, checkExistsEmail } from "@/app/lib/actions";
-import { SignupData, SignupScheme } from "@/app/lib/definitions";
+import { sendVerification, checkExistsEmail } from "@/app/_lib/actions";
+import { SignupData, SignupScheme } from "@/app/_lib/definitions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input, ModalBody, ModalFooter, ModalHeader, Select, SelectItem } from "@nextui-org/react";
 import { eachYearOfInterval } from "date-fns";
 import React, { useRef } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import Logo from "@/app/ui/Logo";
-import { useAppDispatch } from "@/app/lib/hooks";
-import { setSignupData } from "@/app/lib/slices/userSlice";
+import Logo from "@/app/_ui/Logo";
+import { useAppDispatch } from "@/app/_lib/hooks";
+import { setSignupData } from "@/app/_lib/slices/userSlice";
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const days = Array.from({ length: 31 }, (_, i) => i + 1);

@@ -1,8 +1,8 @@
-import { auth } from "@/app/lib/auth";
-import { getUserByUsername } from "@/app/lib/actions";
-import { getUserTwittsByMedia } from '@/app/lib/actions';
+import { auth } from "@/app/_lib/auth";
+import { getUserByUsername } from "@/app/_lib/actions";
+import { getUserTwittsByMedia } from '@/app/_lib/actions';
 import { Metadata } from "next";
-import TwittsList from "@/app/ui/TwittsList";
+import TwittsList from "@/app/_ui/TwittsList";
 
 export async function generateMetadata({ params }: { params: { userId: string } }): Promise<Metadata | void> {
   const user = await getUserByUsername(params.userId);

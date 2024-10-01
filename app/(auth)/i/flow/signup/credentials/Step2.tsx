@@ -1,14 +1,14 @@
 import { ModalBody, ModalFooter, ModalHeader } from "@nextui-org/modal";
 import React, { useRef } from "react";
-import Logo from "@/app/ui/Logo";
+import Logo from "@/app/_ui/Logo";
 import { Button, Input } from "@nextui-org/react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { VerificationData, VerificationScheme } from "@/app/lib/definitions";
+import { VerificationData, VerificationScheme } from "@/app/_lib/definitions";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { checkVerificationCode } from "@/app/lib/actions";
-import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
-import Alert from "@/app/ui/Alert";
-import { setSignupData } from "@/app/lib/slices/userSlice";
+import { checkVerificationCode } from "@/app/_lib/actions";
+import { useAppDispatch, useAppSelector } from "@/app/_lib/hooks";
+import Alert from "@/app/_ui/Alert";
+import { setSignupData } from "@/app/_lib/slices/userSlice";
 
 function Step2({ onTransition }: { onTransition: (callback: () => Promise<any>) => void }) {
   const formRef = useRef<HTMLFormElement>(null);

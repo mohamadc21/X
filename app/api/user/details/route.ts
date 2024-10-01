@@ -1,5 +1,5 @@
-import { getUserById, getUserFollowersAndFollowings } from "@/app/lib/actions";
-import { User } from "@/app/lib/definitions";
+import { getUserById, getUserFollowersAndFollowings } from "@/app/_lib/actions";
+import { User } from "@/app/_lib/definitions";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = 'force-dynamic';

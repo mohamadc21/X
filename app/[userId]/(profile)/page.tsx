@@ -1,6 +1,6 @@
-import { auth } from "@/app/lib/auth";
-import { getUserByUsername } from "@/app/lib/actions";
-import TwittsList from "@/app/ui/TwittsList";
+import { auth } from "@/app/_lib/auth";
+import { getUserByUsername } from "@/app/_lib/actions";
+import TwittsList from "@/app/_ui/TwittsList";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
