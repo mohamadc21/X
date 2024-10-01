@@ -86,7 +86,15 @@ export async function getUserFollowersAndFollowings(user_id: number | string): P
 }
 
 export async function deleteTwitt(twitt_id: number | string) {
-  await query("delete from twitts where id = ?", [twitt_id]);
+  const twitt = await query<ITwitt[]>("select * from twitts where id = ?", [twitt_id]);
+  if (twitt[0].reply_to) {
+    await Promise.all([
+      query("delete from twitts where id = ? ; update twitts set comments = comments - 1 where id = ?", [twitt_id, twitt_id]),
+    ]);
+  } else {
+    await query("delete from twitts where id = ?", [twitt_id]);
+  }
+  revalidatePath('/', 'layout');
 }
 
 export async function signinWithGoogle() {
