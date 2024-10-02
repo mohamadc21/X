@@ -45,7 +45,7 @@ export async function getTwittById(id: number | string): Promise<ITwitt | null> 
 }
 
 export async function getTwittComments(twitt_id: number | string) {
-  const comments = await query<ITwitt[]>("select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.retwitts, twitts.comments, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.reply_to = ? order by twitts.id desc", [twitt_id]);
+  const comments = await query<ITwitt[]>("select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.retwitts, twitts.comments, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.reply_to = ? order by twitts.id desc", [twitt_id]);
 
   return comments;
 }

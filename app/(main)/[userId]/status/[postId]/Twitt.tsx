@@ -4,11 +4,10 @@ import React, { Key, useTransition } from 'react';
 import { deleteTwitt, follow, increaseTwittView, likeTwitt, unFollow } from "@/app/_lib/actions";
 import { ITwitt, SessionUser, UserFollowingsAndFollowers } from "@/app/_lib/definitions";
 import { useAppDispatch } from "@/app/_lib/hooks";
-import { setReplyTo } from "@/app/_lib/slices/appSlice";
 import CreatePost from "@/app/_ui/createPost/CreatePost";
 import { ActionTypes } from "@/app/_ui/Twitt";
 import TwittActions from "@/app/_ui/TwittActions";
-import { Button, Card } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import { MediaPlayer, MediaProvider } from '@vidstack/react';
 import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
 import { format } from "date-fns";
@@ -99,14 +98,7 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
     if (!twitt.views.includes(sessionUser.id as number)) {
       handleIncreaseView();
     }
-    return () => {
-      dispatch(setReplyTo(null));
-    }
   }, []);
-
-  useEffect(() => {
-    dispatch(setReplyTo(twitt));
-  }, [twitt]);
 
   return (
     <>

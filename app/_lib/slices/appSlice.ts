@@ -3,12 +3,10 @@ import { ITwitt } from "../definitions";
 
 interface AppState {
   twitts: ITwitt[] | [],
-  replyTo: ITwitt | null
 }
 
 const initialState: AppState = {
   twitts: [],
-  replyTo: null
 }
 
 const appSlice = createSlice({
@@ -18,12 +16,9 @@ const appSlice = createSlice({
     setTwitts(state, action: PayloadAction<ITwitt[]>) {
       state.twitts = action.payload;
     },
-    setReplyTo(state, action: PayloadAction<ITwitt | null>) {
-      state.replyTo = action.payload;
-    }
   }
 })
 
-export const { setTwitts, setReplyTo } = appSlice.actions;
+export const { setTwitts } = appSlice.actions;
 
 export default appSlice.reducer;

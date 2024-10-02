@@ -20,7 +20,7 @@ async function Page({ params }: { params: { userId: string } }) {
   ]);
 
   return (
-    <div className="px-1">
+    <div className="px-1 py-6">
       {userTwitts.length > 0 ? (
         <TwittsList mediaOnly session={session} allTwitts={userTwitts} />
       ) : (

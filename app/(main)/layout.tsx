@@ -11,7 +11,7 @@ export default async function RootLayout({
   return (
     <>
       <SidebarWrapper />
-      <div className="flex-1 w-full max-w-2xl">
+      <div className="flex-1 w-full max-w-2xl sm:border-x border-x-default">
         <Suspense fallback={<LoadingSpinner />}>
           {children}
         </Suspense>

@@ -1,7 +1,6 @@
 import { deleteTwitt, follow, increaseTwittView, likeTwitt, unFollow } from "@/app/_lib/actions";
 import { ITwitt, SessionUser } from "@/app/_lib/definitions";
 import { useAppDispatch, useIsVisible } from "@/app/_lib/hooks";
-import { setReplyTo } from "@/app/_lib/slices/appSlice";
 import { MediaPlayer, MediaProvider } from "@vidstack/react";
 import {
   defaultLayoutIcons,
@@ -51,9 +50,10 @@ function Twitt({
   const twittRef = useRef(null);
   const isVisible = useIsVisible(twittRef);
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const { mutate } = useSWRConfig();
   const [pending, startTransition] = useTransition();
+
+  console.log(twitt.user_id);
 
   async function handleIncreaseView() {
     optimisticDispatch({
