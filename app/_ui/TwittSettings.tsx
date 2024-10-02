@@ -40,7 +40,7 @@ function TwittSettings({ onMenuAction, twitt, user }: { onMenuAction: (e: Key) =
         onAction={onMenuAction}
       >
         <DropdownItem
-          className="text-red-500"
+          className={`text-red-500 ${twitt.user_id != user.id ? 'hidden' : ''}`}
           key="delete"
           hidden={twitt.user_id != user.id}
           startContent={<GoTrash />}
