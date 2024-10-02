@@ -57,7 +57,7 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
     defaultOpen: props?.defaultOpen || true,
     isDismissable: props?.isDismissable || false,
     classNames: {
-      wrapper: props?.classNames?.wrapper || 'items-stretch',
+      wrapper: props?.classNames?.wrapper || (props?.ignureMobileSize ? '' : 'items-stretch'),
       backdrop: `${props?.classNames?.backdrop} ${props?.defaultBackdrop || 'bg-gray-700/70'}`,
       header: `${props?.classNames?.header || ''} z-[3] bg-background`,
       body: `${props?.classNames?.body} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'} pb-4 pt-8 overflow-y-auto`,
@@ -66,7 +66,8 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
     },
     radius: props?.radius || "lg",
     scrollBehavior: inMobile ? undefined : (props?.scrollBehavior || "inside"),
-    size: inMobile ? 'full' : (props?.size || "md"),
-    shouldBlockScroll: props?.shouldBlockScroll || true
+    size: (props?.ignureMobileSize) ? (props.size || "md") : (inMobile ? 'full' : (props?.size || "md")),
+    shouldBlockScroll: props?.shouldBlockScroll || true,
+    placement: props?.placement || 'center'
   }
 } 

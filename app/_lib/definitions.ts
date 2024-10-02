@@ -90,26 +90,28 @@ export interface Verification {
 }
 
 export interface ModalProps {
-  className?: string | undefined,
-  defaultOpen?: boolean | undefined,
-  isDismissable?: boolean | undefined,
+  className?: string,
+  defaultOpen?: boolean,
+  isDismissable?: boolean,
   defaultBackdrop?: boolean,
   centerContent?: boolean,
   classNames?: {
-    wrapper?: string | undefined,
-    base?: string | undefined,
-    header?: string | undefined,
-    backdrop?: string | undefined,
-    body?: string | undefined,
-    footer?: string | undefined,
-    closeButton?: string | undefined
+    wrapper?: string,
+    base?: string,
+    header?: string,
+    backdrop?: string,
+    body?: string,
+    footer?: string,
+    closeButton?: string
   }
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "full" | undefined;
-  radius?: "sm" | "md" | "lg" | "none" | undefined;
-  scrollBehavior?: "normal" | "inside" | "outside" | undefined;
-  backdrop?: "transparent" | "opaque" | "blur" | undefined;
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "full";
+  radius?: "sm" | "md" | "lg" | "none";
+  scrollBehavior?: "normal" | "inside" | "outside";
+  backdrop?: "transparent" | "opaque" | "blur";
   isKeyboardDismissDisabled?: boolean | undefined,
-  shouldBlockScroll?: boolean
+  shouldBlockScroll?: boolean,
+  ignureMobileSize?: boolean,
+  placement?: "center" | "auto" | "top" | "top-center" | "bottom" | "bottom-center"
 }
 
 export type ActionError = {

@@ -12,11 +12,12 @@ function DeleteConfirm({ children, desc, action, onClose, pending }: { children:
                 onClose?.();
                 onModalClose();
             }
-        }} {...useModalProps({
-            centerContent: false, isDismissable: true, classNames: {
-                closeButton: 'hidden'
-            }
-        })}>
+        }}
+            {...useModalProps({
+                centerContent: false, isDismissable: true, ignureMobileSize: true,
+            })}
+            hideCloseButton
+        >
             <ModalContent>
                 <ModalBody>
                     <h2 className="text-xl font-bold">{children}</h2>
