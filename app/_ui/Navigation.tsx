@@ -128,7 +128,7 @@ function Navigation({ user }: { user: SessionUser }) {
       {user && (
         <Dropdown>
           <DropdownTrigger>
-            <Button variant="light" className="xl:py-8 flex xl:justify-start xl:px-3 justify-center items-center xl:w-full xl:max-w-[235px] xl:max-h-max w-11 h-11 min-w-0 px-0 rounded-full">
+            <Button variant="light" className="xl:py-8 sm:flex hidden xl:justify-start xl:px-3 justify-center items-center xl:w-full xl:max-w-[235px] xl:max-h-max w-11 h-11 min-w-0 px-0 rounded-full">
               <div className="flex items-center justify-center overflow-hidden gap-3">
                 <img width={44} height={44} alt={user?.name!} src={user.image} className="rounded-full w-11 h-11 flex-shrink-0" />
                 <div className="text-left xl:flex flex-col items-start justify-center hidden gap-0 truncate">
