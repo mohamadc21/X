@@ -23,6 +23,7 @@ function BottomNavigation({ user }: { user: SessionUser }) {
         outline: <GoHome size={25} />,
         filled: <GoHomeFill size={25} />,
       },
+      disabled: false
     },
     {
       href: '/explore',
@@ -31,6 +32,7 @@ function BottomNavigation({ user }: { user: SessionUser }) {
         outline: <IoIosSearch size={25} />,
         filled: <IoIosSearch size={25} />,
       },
+      disabled: true
     },
     {
       href: '/notifications',
@@ -40,6 +42,7 @@ function BottomNavigation({ user }: { user: SessionUser }) {
 
         filled: <IoNotifications size={25} />,
       },
+      disabled: true
     },
     {
       href: '/messages',
@@ -48,6 +51,7 @@ function BottomNavigation({ user }: { user: SessionUser }) {
         outline: <IoMailOutline size={25} />,
         filled: <IoMail size={25} />,
       },
+      disabled: true
     },
     {
       href: `/${user.username}`,
@@ -56,6 +60,7 @@ function BottomNavigation({ user }: { user: SessionUser }) {
         outline: <BiUser size={25} />,
         filled: <BiSolidUser size={25} />,
       },
+      disabled: false
     },
   ]
 
@@ -65,13 +70,13 @@ function BottomNavigation({ user }: { user: SessionUser }) {
         {links.map((link, idx) => (
           <li key={idx}>
             {idx === 0 ? (
-              <Button variant="light" as={link?.href ? Link : "button"} href={link?.href || undefined} size="lg" isIconOnly className="flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" radius="full">
+              <Button variant="light" as={link?.href ? Link : "button"} href={link?.href || undefined} size="lg" isIconOnly className="flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" isDisabled={link.disabled} radius="full">
                 <Badge content="" size="sm" color="primary">
                   {pathname === link.href ? link.logo.filled : link.logo.outline}
                 </Badge>
               </Button>
             ) : (
-              <Button variant="light" as={link?.href ? Link : "button"} href={link?.href || undefined} size="lg" isIconOnly className="flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" radius="full">
+              <Button variant="light" as={link?.href ? Link : "button"} href={link?.href || undefined} size="lg" isIconOnly className="flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" isDisabled={link.disabled} radius="full">
                 {pathname === link.href ? link.logo.filled : link.logo.outline}
               </Button>
             )}
