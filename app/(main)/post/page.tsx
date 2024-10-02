@@ -4,15 +4,22 @@ import CreatePostWrapper from "@/app/_ui/createPost/CreatePostWrapper";
 import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: 'Create post'
+export function generateMetadata({ searchParams }: {
+  searchParams?: { [key: string]: string | null }
+}): Metadata {
+  const replyTo = searchParams?.replyto;
+  return {
+    title: replyTo ? 'Post your reply' : 'Create post'
+  }
 }
 
-function Page() {
+function Page({ searchParams }: {
+  searchParams?: { [key: string]: string | null }
+}) {
   return (
     <PostModal>
       <Suspense fallback={<LoadingSpinner />}>
-        <CreatePostWrapper />
+        <CreatePostWrapper replyTo={searchParams?.replyto} />
       </Suspense>
     </PostModal>
   )

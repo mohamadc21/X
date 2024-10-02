@@ -56,13 +56,16 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
 
   useEffect(() => {
     setProfileDetails({ ...user, follows });
+  }, [user, follows]);
+
+  useEffect(() => {
     dispatch(setUserData({
       ...user,
       created_at: user.created_at as string,
       updated_at: user.updated_at as string,
       twitts: user.twitts
     }));
-  }, [user, follows]);
+  }, [profileDetails]);
 
   useEffect(() => {
     if (pathname === `/${profileDetails.username}`) setCurrentTab('posts');

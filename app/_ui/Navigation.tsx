@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 import { BiSolidUser, BiUser } from "react-icons/bi";
 import { IoNotifications, IoNotificationsOutline } from "react-icons/io5";
 import { IoMail, IoMailOutline } from "react-icons/io5";
-import { Badge, Card, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
+import { Badge, Card, CardHeader, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 import { SessionUser } from "../_lib/definitions";
 import { logOut } from "../_lib/actions";
 
@@ -128,7 +128,7 @@ function Navigation({ user }: { user: SessionUser }) {
       {user && (
         <Dropdown>
           <DropdownTrigger>
-            <Card className="flex xl:px-3 xl:py-7 xl:justify-start justify-center items-center xl:w-full xl:max-w-[235px] w-11 h-11 rounded-full bg-transparent" isPressable>
+            <Button variant="light" className="xl:py-8 flex xl:justify-start xl:px-3 justify-center items-center xl:w-full xl:max-w-[235px] xl:max-h-max w-11 h-11 min-w-0 px-0 rounded-full">
               <div className="flex items-center justify-center overflow-hidden gap-3">
                 <img width={44} height={44} alt={user?.name!} src={user.image} className="rounded-full w-11 h-11 flex-shrink-0" />
                 <div className="text-left xl:flex flex-col items-start justify-center hidden gap-0 truncate">
@@ -136,7 +136,7 @@ function Navigation({ user }: { user: SessionUser }) {
                   <p className="text-darkgray truncate max-w-full">@{user.username}</p>
                 </div>
               </div>
-            </Card>
+            </Button>
           </DropdownTrigger>
           <DropdownMenu
             variant="bordered"

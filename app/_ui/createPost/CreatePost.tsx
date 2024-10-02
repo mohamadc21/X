@@ -1,14 +1,14 @@
 "use client";
 
 import { addTwitt } from "@/app/_lib/actions";
-import { AddTwitt, SessionUser } from "@/app/_lib/definitions";
+import { AddTwitt, ITwitt, SessionUser } from "@/app/_lib/definitions";
 import { useAppSelector, useModalProps } from "@/app/_lib/hooks";
 import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import { GiphyFetch, ICategory } from "@giphy/js-fetch-api";
 import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
 import { format } from "date-fns";
 import EmojiPicker, { EmojiClickData, EmojiStyle, SkinTonePickerLocation, Theme } from 'emoji-picker-react';
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { ChangeEvent, useEffect, useRef, useState, useTransition } from "react";
 import { BsEmojiSmile } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";
@@ -24,6 +24,7 @@ type Props = {
   noPadding?: boolean,
   type?: 'post' | 'reply',
   showOnClick?: boolean,
+  serverSideReplyTo?: ITwitt | null
 }
 
 const options = [
@@ -53,7 +54,7 @@ const options = [
   // },
 ]
 
-function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post", showOnClick = false }: Props) {
+function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post", showOnClick = false, serverSideReplyTo }: Props) {
   const [mounted, setMounted] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [text, setText] = useState('');
@@ -65,6 +66,7 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
     temp: null,
     type: null
   });
+  const [replyTo, setReplyTo] = useState<ITwitt | null | undefined>(serverSideReplyTo);
   const [error, setError] = useState('');
   const [gifs, setGifs] = useState<any[]>([]);
   const [gif, setGif] = useState('');
@@ -76,9 +78,10 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
   const modalProps = useModalProps;
   const router = useRouter();
   const { mutate } = useSWRConfig();
-  const replyTo = useAppSelector(state => state.app.replyTo);
+  const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const twitts = useAppSelector(state => state.app.twitts);
 
   function handleAddTwitt() {
     startTransition(async () => {
@@ -153,6 +156,16 @@ function CreatePost({ user, asModal = false, rows = 2, noPadding, type = "post",
     const emojiSrc = emoji.getImageUrl(EmojiStyle.TWITTER);
     setFullText(prev => prev += `<img class="inline-block mx-0.5" src="${emojiSrc}" width="17" alt="${emoji.names[0]}" />`)
   }
+
+  useEffect(() => {
+    const replyToSearchParam = searchParams.get('replyto');
+    if (!replyToSearchParam) return;
+
+    const replyToTwitt = twitts.find(twitt => twitt?.id === parseInt(replyToSearchParam));
+    if (replyToTwitt) {
+      setReplyTo(replyToTwitt);
+    }
+  }, [twitts, searchParams, replyTo]);
 
   useEffect(() => {
     async function fetchCategories() {

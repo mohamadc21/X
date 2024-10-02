@@ -17,6 +17,7 @@ import TwittActions from "./TwittActions";
 import TwittSettings from "./TwittSettings";
 import Alert from "./Alert";
 import LoadingSpinner from "./LoadingSpinner";
+import { optimizedText } from "../_utils/optimizedText";
 
 export const ActionTypes = {
   INCREASE_VIEW: "INCREASE_VIEW",
@@ -197,7 +198,7 @@ function Twitt({
             className="w-[45px] h-[45px]"
           >
             <img
-              className="sm:block hidden w-[45px] h-[45px] rounded-full flex-shrink-0 object-cover"
+              className="w-[45px] h-[45px] rounded-full flex-shrink-0 object-cover"
               src={twitt.user_profile}
               alt={twitt.name!}
             />
@@ -231,7 +232,7 @@ function Twitt({
                 <p
                   className="whitespace-pre-wrap leading-5 break-words to-twitt"
                   dir={/[\u0600-\u06FF]/.test(twitt.text) ? "rtl" : "ltr"}
-                  dangerouslySetInnerHTML={{ __html: twitt.text }}
+                  dangerouslySetInnerHTML={{ __html: optimizedText(twitt.text) }}
                 />
               )}
               {twitt.media && ['image', 'gif'].includes(twitt.media_type ?? '') && (
@@ -267,8 +268,7 @@ function Twitt({
               twitt={twitt}
               user={user}
               onCommentsClick={() => {
-                dispatch(setReplyTo(twitt));
-                router.push("/post");
+                router.push(`/post?replyto=${twitt.id}`);
               }}
               onLike={handleTwittLike}
               className="-ml-2 to-twitt"

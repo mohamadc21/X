@@ -15,10 +15,11 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import TwittSettings from '@/app/_ui/TwittSettings';
-import useSWR, { SWRConfig, useSWRConfig } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import DeleteConfirm from '@/app/_ui/DeleteConfirm';
 import Alert from '@/app/_ui/Alert';
 import Link from 'next/link';
+import { optimizedText } from '@/app/_utils/optimizedText';
 
 const numeral = require('numeral');
 
@@ -151,7 +152,7 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
           <p
             className="whitespace-pre-wrap leading-5 break-words to-twitt text-lg"
             dir={/[\u0600-\u06FF]/.test(twitt.text) ? 'rtl' : 'ltr'}
-            dangerouslySetInnerHTML={{ __html: twitt.text }}
+            dangerouslySetInnerHTML={{ __html: optimizedText(twitt.text) }}
           />
         )}
         {twitt.media && ['image', 'gif'].includes(twitt.media_type ?? '') && (
@@ -186,8 +187,7 @@ function Twitt({ data, sessionUser }: { data: ITwitt & { follows: UserFollowings
           twitt={twitt}
           user={sessionUser}
           onCommentsClick={() => {
-            dispatch(setReplyTo(twitt))
-            router.push('/post');
+            router.push(`/post?replyto=${twitt.id}`);
           }}
           onLike={handleTwittLike}
           className="border-y border-y-default py-2"
