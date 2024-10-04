@@ -252,11 +252,11 @@ function Twitt({
               )}
               {twitt.media &&
                 ["image", "gif"].includes(twitt.media_type ?? "") && (
-                  <>
+                  <div className="border border-default mt-4 rounded-2xl ">
                     <img
                       src={twitt.media}
                       alt={twitt.text}
-                      className={`${imageSize.width ? "" : "hidden"} mt-4 rounded-2xl to-twitt object-cover border border-default`}
+                      className={`${imageSize.width ? "" : "hidden"} to-twitt object-cover rounded-2xl`}
                       onLoad={(target) => {
                         setSmageSize({
                           width: target.currentTarget.naturalWidth,
@@ -267,11 +267,11 @@ function Twitt({
                       height={imageSize.height}
                     />
                     {!imageSize.width && (
-                      <div className="w-full h-[200px] flex items-center justify-center">
+                      <div className="w-full h-[300px] flex items-center justify-center">
                         <LoadingSpinner noPadding />
                       </div>
                     )}
-                  </>
+                  </div>
                 )}
               {twitt.media && twitt.media_type === "video" && (
                 <MediaPlayer src={twitt.media} className="mt-4 border border-default-200">

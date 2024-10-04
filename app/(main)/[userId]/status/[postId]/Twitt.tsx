@@ -31,6 +31,7 @@ import DeleteConfirm from "@/app/_ui/DeleteConfirm";
 import Alert from "@/app/_ui/Alert";
 import Link from "next/link";
 import { optimizedText } from "@/app/_utils/optimizedText";
+import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 
 const numeral = require("numeral");
 
@@ -190,19 +191,26 @@ function Twitt({
           />
         )}
         {twitt.media && ["image", "gif"].includes(twitt.media_type ?? "") && (
-          <img
-            src={twitt.media}
-            alt="twitt image"
-            className="mt-4 rounded-2xl to-twitt object-cover border border-default"
-            onLoad={(target) => {
-              setSmageSize({
-                width: target.currentTarget.naturalWidth,
-                height: target.currentTarget.naturalHeight,
-              });
-            }}
-            width={imageSize.width}
-            height={imageSize.height}
-          />
+          <div className="border border-default mt-4 rounded-2xl">
+            <img
+              src={twitt.media}
+              alt={twitt.text}
+              className={`${imageSize.width ? "" : "hidden"} rounded-2xl to-twitt object-cover`}
+              onLoad={(target) => {
+                setSmageSize({
+                  width: target.currentTarget.naturalWidth,
+                  height: target.currentTarget.naturalHeight,
+                });
+              }}
+              width={imageSize.width}
+              height={imageSize.height}
+            />
+            {!imageSize.width && (
+              <div className="w-full h-[300px] flex items-center justify-center">
+                <LoadingSpinner noPadding />
+              </div>
+            )}
+          </div>
         )}
         {twitt.media && twitt.media_type === "video" && (
           <MediaPlayer src={twitt.media} className="mt-4 border border-default">
