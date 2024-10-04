@@ -15,7 +15,7 @@ async function CreatePostWrapper({ replyTo }: { replyTo?: number | string | null
     <CreatePost
       user={session.user}
       asModal
-      serverSideReplyTo={twitt}
+      initialReplyTo={twitt}
     />
   )
 }
