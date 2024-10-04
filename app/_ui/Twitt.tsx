@@ -252,7 +252,7 @@ function Twitt({
               )}
               {twitt.media &&
                 ["image", "gif"].includes(twitt.media_type ?? "") && (
-                  <div className="border border-default mt-4 rounded-2xl ">
+                  <div className="border border-default mt-4 to-twitt rounded-2xl ">
                     <img
                       src={twitt.media}
                       alt={twitt.text}
@@ -267,14 +267,14 @@ function Twitt({
                       height={imageSize.height}
                     />
                     {!imageSize.width && (
-                      <div className="w-full h-[300px] flex items-center justify-center">
+                      <div className="w-full h-[300px] flex items-center justify-center to-twitt">
                         <LoadingSpinner noPadding />
                       </div>
                     )}
                   </div>
                 )}
               {twitt.media && twitt.media_type === "video" && (
-                <MediaPlayer src={twitt.media} className="mt-4 border border-default-200">
+                <MediaPlayer src={twitt.media} className="mt-4 border border-default-200 to-twitt">
                   <MediaProvider />
                   <DefaultVideoLayout icons={defaultLayoutIcons} />
                 </MediaPlayer>
