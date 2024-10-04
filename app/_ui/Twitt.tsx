@@ -1,4 +1,10 @@
-import { deleteTwitt, follow, increaseTwittView, likeTwitt, unFollow } from "@/app/_lib/actions";
+import {
+  deleteTwitt,
+  follow,
+  increaseTwittView,
+  likeTwitt,
+  unFollow,
+} from "@/app/_lib/actions";
 import { ITwitt, SessionUser } from "@/app/_lib/definitions";
 import { useAppDispatch, useIsVisible } from "@/app/_lib/hooks";
 import { MediaPlayer, MediaProvider } from "@vidstack/react";
@@ -9,7 +15,14 @@ import {
 import { format } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { Key, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
+import React, {
+  Key,
+  useEffect,
+  useOptimistic,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { useSWRConfig } from "swr";
 import DeleteConfirm from "./DeleteConfirm";
 import TwittActions from "./TwittActions";
@@ -46,14 +59,12 @@ function Twitt({
     height: 0,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const twittRef = useRef(null);
   const isVisible = useIsVisible(twittRef);
   const router = useRouter();
   const { mutate } = useSWRConfig();
   const [pending, startTransition] = useTransition();
-
-  console.log(twitt.user_id);
 
   async function handleIncreaseView() {
     optimisticDispatch({
@@ -133,26 +144,27 @@ function Twitt({
   }
 
   async function handleMenuAction(key: Key) {
-    setMessage('');
-    if (key === 'delete') {
+    setMessage("");
+    if (key === "delete") {
       setShowDeleteConfirm(true);
-    } else if (key === 'follow') {
+    } else if (key === "follow") {
       await follow(user.id, twitt.user_id);
-      setMessage(`You're now following @${twitt.username}`)
-    } else if (key === 'unfollow') {
+      setMessage(`You're now following @${twitt.username}`);
+    } else if (key === "unfollow") {
       await unFollow(user.id, twitt.user_id);
-      setMessage(`@${twitt.username} now is not in your followings`)
+      setMessage(`@${twitt.username} now is not in your followings`);
     } else {
-      setMessage('This option is not available for now.');
+      setMessage("This option is not available for now.");
     }
   }
 
   async function handleTwittDelete() {
     startTransition(async () => {
       await deleteTwitt(twitt.id);
-      mutate('/api/twitts');
-      mutate('/api/twitts/comments');
-      mutate('/api/user/twitts');
+      setTwitts((prev) => prev.filter((t) => t.id !== twitt.id));
+      mutate("/api/twitts");
+      mutate("/api/twitts/comments");
+      mutate("/api/user/twitts");
       setShowDeleteConfirm(false);
     });
   }
@@ -169,7 +181,7 @@ function Twitt({
 
   useEffect(() => {
     if (message) {
-      setTimeout(() => setMessage(''), 5000);
+      setTimeout(() => setMessage(""), 5000);
     }
   }, [message]);
 
@@ -193,10 +205,7 @@ function Twitt({
           className="grid gap-4 to-twitt"
           style={{ gridTemplateColumns: "45px 1fr" }}
         >
-          <Link
-            href={`/${twitt.username}`}
-            className="w-[45px] h-[45px]"
-          >
+          <Link href={`/${twitt.username}`} className="w-[45px] h-[45px]">
             <img
               className="w-[45px] h-[45px] rounded-full flex-shrink-0 object-cover"
               src={twitt.user_profile}
@@ -226,39 +235,46 @@ function Twitt({
                     {format(new Date(twitt.created_at).toISOString(), "MMM d")}
                   </p>
                 </div>
-                <TwittSettings user={user} twitt={twitt} onMenuAction={(key) => handleMenuAction(key)} />
+                <TwittSettings
+                  user={user}
+                  twitt={twitt}
+                  onMenuAction={(key) => handleMenuAction(key)}
+                />
               </div>
               {twitt.text && (
                 <p
                   className="whitespace-pre-wrap leading-5 break-words to-twitt"
                   dir={/[\u0600-\u06FF]/.test(twitt.text) ? "rtl" : "ltr"}
-                  dangerouslySetInnerHTML={{ __html: optimizedText(twitt.text) }}
+                  dangerouslySetInnerHTML={{
+                    __html: optimizedText(twitt.text),
+                  }}
                 />
               )}
-              {twitt.media && ['image', 'gif'].includes(twitt.media_type ?? '') && (
-                <>
-                  <img
-                    src={twitt.media}
-                    alt={twitt.text}
-                    className={`${imageSize.width ? '' : 'hidden'} mt-4`}
-                    onLoad={(target) => {
-                      setSmageSize({
-                        width: target.currentTarget.naturalWidth,
-                        height: target.currentTarget.naturalHeight,
-                      });
-                    }}
-                    width={imageSize.width}
-                    height={imageSize.height}
-                  />
-                  {!imageSize.width && (
-                    <div className="w-full h-[150px] flex items-center justify-center">
-                      <LoadingSpinner noPadding />
-                    </div>
-                  )}
-                </>
-              )}
+              {twitt.media &&
+                ["image", "gif"].includes(twitt.media_type ?? "") && (
+                  <>
+                    <img
+                      src={twitt.media}
+                      alt={twitt.text}
+                      className={`${imageSize.width ? "" : "hidden"} mt-4 rounded-2xl to-twitt object-cover border border-default`}
+                      onLoad={(target) => {
+                        setSmageSize({
+                          width: target.currentTarget.naturalWidth,
+                          height: target.currentTarget.naturalHeight,
+                        });
+                      }}
+                      width={imageSize.width}
+                      height={imageSize.height}
+                    />
+                    {!imageSize.width && (
+                      <div className="w-full h-[200px] flex items-center justify-center">
+                        <LoadingSpinner noPadding />
+                      </div>
+                    )}
+                  </>
+                )}
               {twitt.media && twitt.media_type === "video" && (
-                <MediaPlayer src={twitt.media} className="mt-4">
+                <MediaPlayer src={twitt.media} className="mt-4 border border-default-200">
                   <MediaProvider />
                   <DefaultVideoLayout icons={defaultLayoutIcons} />
                 </MediaPlayer>
@@ -278,7 +294,14 @@ function Twitt({
         </div>
       )}
       {showDeleteConfirm && (
-        <DeleteConfirm desc="This can’t be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results. " action={handleTwittDelete} onClose={() => setShowDeleteConfirm(false)} pending={pending}>Delete Post?</DeleteConfirm>
+        <DeleteConfirm
+          desc="This can’t be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from search results. "
+          action={handleTwittDelete}
+          onClose={() => setShowDeleteConfirm(false)}
+          pending={pending}
+        >
+          Delete Post?
+        </DeleteConfirm>
       )}
     </div>
   );

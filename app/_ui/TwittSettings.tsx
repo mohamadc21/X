@@ -1,4 +1,10 @@
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@nextui-org/react";
 import React, { Key } from "react";
 import { BsStars } from "react-icons/bs";
 import { FaRegComment } from "react-icons/fa";
@@ -9,7 +15,15 @@ import { MdBlock, MdOutlinePushPin } from "react-icons/md";
 import { RiPagesLine } from "react-icons/ri";
 import { ITwitt, SessionUser } from "@/app/_lib/definitions";
 
-function TwittSettings({ onMenuAction, twitt, user }: { onMenuAction: (e: Key) => void, twitt: ITwitt, user: SessionUser }) {
+function TwittSettings({
+  onMenuAction,
+  twitt,
+  user,
+}: {
+  onMenuAction: (e: Key) => void;
+  twitt: ITwitt;
+  user: SessionUser;
+}) {
   return (
     <Dropdown>
       <DropdownTrigger className="z-0">
@@ -40,36 +54,47 @@ function TwittSettings({ onMenuAction, twitt, user }: { onMenuAction: (e: Key) =
         onAction={onMenuAction}
       >
         <DropdownItem
-          className={`text-red-500 ${twitt.user_id != user.id ? 'hidden' : ''}`}
+          className={`text-red-500 ${twitt.user_id != user.id ? "hidden" : ""}`}
           key="delete"
           hidden={twitt.user_id != user.id}
           startContent={<GoTrash />}
         >
           Delete
         </DropdownItem>
-        <DropdownItem key={user.follows.followings.includes(twitt.user_id as number) ? 'unfollow' : 'follow'} className={`${user.id == twitt.user_id ? 'hidden' : ''}`} hidden={twitt.user_id == user.id} startContent={<LuUserPlus />}>
-          {user.follows.followings.includes(twitt.user_id as number) ? "Unfollow" : "Follow"} @{twitt.username}
-        </DropdownItem>
-        <DropdownItem key="block" className={`${user.id == twitt.user_id ? 'hidden' : ''}`} hidden={twitt.user_id == user.id} startContent={<MdBlock />}>
-          Block @{twitt.username}
+        <DropdownItem
+          key={
+            user.follows.followings.includes(twitt.user_id as number)
+              ? "unfollow"
+              : "follow"
+          }
+          className={`${user.id == twitt.user_id ? "hidden" : ""}`}
+          hidden={twitt.user_id == user.id}
+          startContent={<LuUserPlus />}
+        >
+          {user.follows.followings.includes(twitt.user_id as number)
+            ? "Unfollow"
+            : "Follow"}{" "}
+          @{twitt.username}
         </DropdownItem>
         <DropdownItem
-          key="pin"
-          startContent={<MdOutlinePushPin />}
+          key="block"
+          className={`${user.id == twitt.user_id ? "hidden" : ""}`}
+          hidden={twitt.user_id == user.id}
+          startContent={<MdBlock />}
         >
+          Block @{twitt.username}
+        </DropdownItem>
+        <DropdownItem key="pin" startContent={<MdOutlinePushPin />}>
           Pin to your profile
         </DropdownItem>
         <DropdownItem key="highlight" startContent={<BsStars />}>
           Highlight on your profile
         </DropdownItem>
-        <DropdownItem
-          key="add-remove"
-          startContent={<RiPagesLine />}
-        >
+        <DropdownItem key="add-remove" startContent={<RiPagesLine />}>
           Add/remove @{twitt.username} from Lists
         </DropdownItem>
         <DropdownItem
-          className={`${user.id != twitt.user_id ? 'hidden' : ''}`}
+          className={`${user.id != twitt.user_id ? "hidden" : ""}`}
           hidden={twitt.user_id != user.id}
           key="change-reply"
           startContent={<FaRegComment />}
@@ -78,7 +103,7 @@ function TwittSettings({ onMenuAction, twitt, user }: { onMenuAction: (e: Key) =
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  )
+  );
 }
 
 export default TwittSettings;

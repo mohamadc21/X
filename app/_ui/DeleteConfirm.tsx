@@ -1,5 +1,5 @@
 import { Button } from "@nextui-org/button";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/modal";
+import { Modal, ModalBody, ModalContent, ModalFooter, useDisclosure } from "@nextui-org/modal";
 import React from "react";
 import { useModalProps } from "../_lib/hooks";
 import LoadingSpinner from "./LoadingSpinner";

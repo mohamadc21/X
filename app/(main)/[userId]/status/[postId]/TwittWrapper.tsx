@@ -1,4 +1,7 @@
-import { getTwittById, getUserFollowersAndFollowings } from "@/app/_lib/actions";
+import {
+  getTwittById,
+  getUserFollowersAndFollowings,
+} from "@/app/_lib/actions";
 import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
 import Twitt from "./Twitt";
@@ -10,8 +13,8 @@ async function TwittWrapper({ postId }: { postId: string }) {
   const [session, twitt, follows] = await Promise.all([
     auth(),
     getTwittById(postId),
-    getUserFollowersAndFollowings(postId)
-  ])
+    getUserFollowersAndFollowings(postId),
+  ]);
 
   if (!twitt) notFound();
   const twittWithFollows = { ...twitt, follows };
@@ -25,7 +28,7 @@ async function TwittWrapper({ postId }: { postId: string }) {
         </Suspense>
       )}
     </div>
-  )
+  );
 }
 
 export default TwittWrapper;

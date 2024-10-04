@@ -11,6 +11,23 @@ export const metadata: Metadata = {
     template: '%s / X',
     default: 'X'
   },
+  description: "X social media platform",
+  keywords: ['twitter', 'x', 'social media', 'chat', 'vercel x', 'vercel twitter'],
+  openGraph: {
+    title: {
+      template: '%s / X',
+      default: 'X'
+    },
+    description: "X social media platform",
+    images: [
+      {
+        url: '/default_white.jpg',
+        width: '150px',
+        height: '150px',
+        type: 'image/jpeg',
+      }
+    ]
+  }
 };
 
 export default async function RootLayout({
