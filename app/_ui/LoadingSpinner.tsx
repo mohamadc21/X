@@ -1,9 +1,9 @@
 
-function LoadingSpinner({ wrapperClassName, noPadding = false, className, color, size = 'default', type = 'default' }: { wrapperClassName?: string, className?: string, color?: string, size?: 'sm' | 'default', type?: 'default' | 'fullscreen', noPadding?: boolean }) {
+function LoadingSpinner({ wrapperClassName, noPadding = false, className, color, size = 'default', type = 'default' }: { wrapperClassName?: string, className?: string, color?: string, size?: 'sm' | 'default', type?: 'default' | 'fullscreen' | 'fullheight', noPadding?: boolean }) {
 
   let spinnerSize = 'w-7 h-7';
   if (size === 'sm') spinnerSize = 'w-5 h-5';
-  let spinnerType = `${!noPadding && size !== 'sm' ? 'p-3' : ''} ${size === 'sm' ? '' : 'w-full min-h-full flex items-center justify-center'}`;
+  let spinnerType = `${!noPadding && size !== 'sm' ? 'p-3' : ''} ${size === 'sm' ? '' : 'w-full flex items-center justify-center'} ${type === 'fullheight' ? 'sm:min-h-[100dvh] min-h-[80dvh]' : 'min-h-full'}`;
   if (type === 'fullscreen') spinnerType = 'fixed inset-0 flex p-3 w-full bg-background items-center justify-center';
 
   return (

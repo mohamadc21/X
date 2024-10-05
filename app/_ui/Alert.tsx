@@ -22,7 +22,7 @@ function Alert({ children, className, position = 'bottom', type = 'absolute' }: 
 
   return (
     <div
-      className={`${type} ${position === 'top' ? 'top-10' : 'bottom-5'} left-1/2 -translate-x-1/2 bg-primary py-2.5 px-5 whitespace-nowrap rounded text-foreground flex items-center justify-center z-50 ${className}`}
+      className={`${type} ${position === 'top' ? 'top-10' : 'sm:bottom-5 bottom-20'} left-1/2 -translate-x-1/2 bg-primary py-2.5 px-5 whitespace-nowrap rounded text-foreground flex items-center justify-center z-50 ${className}`}
     >
       <span>
         {children}

@@ -154,7 +154,7 @@ function Twitt({
       await unFollow(user.id, twitt.user_id);
       setMessage(`@${twitt.username} now is not in your followings`);
     } else {
-      setMessage("This option is not available for now.");
+      setMessage("This action is not available for now.");
     }
   }
 
@@ -189,7 +189,7 @@ function Twitt({
     <div
       ref={twittRef}
       className={`${mediaOnly ? "" : "border-b border-default px-4 py-3"
-        } bg-transparent hover:bg-default/15 transition cursor-pointer to-twitt`}
+        } bg-transparent hover:bg-default/15 transition cursor-pointer to-twitt w-full`}
       onClick={handleTwittClick}
     >
       {mediaOnly ? (
@@ -205,9 +205,9 @@ function Twitt({
           className="grid gap-4 to-twitt"
           style={{ gridTemplateColumns: "45px 1fr" }}
         >
-          <Link href={`/${twitt.username}`} className="w-[45px] h-[45px]">
+          <Link href={`/${twitt.username}`} className="w-[45px] h-[45px] flex-shrink-0">
             <img
-              className="w-[45px] h-[45px] rounded-full flex-shrink-0 object-cover"
+              className="w-[45px] h-[45px] rounded-full object-cover"
               src={twitt.user_profile}
               alt={twitt.name!}
             />
@@ -215,31 +215,31 @@ function Twitt({
           <div className="flex flex-col gap-3 sm:ml-0 -ml-[7px] to-twitt">
             <div className="to-twitt">
               <div className="flex items-center justify-between relative">
-                <div className="flex items-start gap-4 whitespace-nowrap to-twitt">
-                  <div className="flex items-center gap-1 truncate overflow-hidden">
-                    <Link
-                      href={`/${twitt.username}`}
-                      className="font-bold max-[400px]:text-[15px] text-foreground"
-                    >
-                      {twitt.name}
-                    </Link>
-                    <Link
-                      href={`/${twitt.username}`}
-                      className="text-default-400 overflow-hidden max-[400px]:text-[13px]"
-                    >
-                      @{twitt.username}
-                    </Link>
-                  </div>
+                <div className="flex items-start whitespace-nowrap to-twitt truncate overflow-hidden gap-1">
+                  <Link
+                    href={`/${twitt.username}`}
+                    className="font-bold max-[430px]:text-[15px] text-foreground truncate"
+                  >
+                    {twitt.name}
+                  </Link>
+                  <Link
+                    href={`/${twitt.username}`}
+                    className="text-default-400 overflow-hidden max-[430px]:hidden"
+                  >
+                    @{twitt.username}
+                  </Link>
                   <p className="text-default-400">-</p>
                   <p className="text-default-400">
                     {format(new Date(twitt.created_at).toISOString(), "MMM d")}
                   </p>
                 </div>
-                <TwittSettings
-                  user={user}
-                  twitt={twitt}
-                  onMenuAction={(key) => handleMenuAction(key)}
-                />
+                <div>
+                  <TwittSettings
+                    user={user}
+                    twitt={twitt}
+                    onMenuAction={(key) => handleMenuAction(key)}
+                  />
+                </div>
               </div>
               {twitt.text && (
                 <p

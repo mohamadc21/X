@@ -2,7 +2,6 @@ import { Session } from "next-auth";
 import React from "react";
 import Logo from "./Logo";
 import Link from "next/link";
-import { Button } from "@nextui-org/button";
 
 function Header({ user }: { user: Session['user'] }) {
   return (
@@ -10,11 +9,11 @@ function Header({ user }: { user: Session['user'] }) {
       <div className="flex items-center justify-between w-full">
         <Link href={`/${user.username}`}>
           <img
-            width={30}
-            height={30}
+            width={35}
+            height={35}
             src={user.image}
             alt={user.name}
-            className="rounded-full w-[30px] h-[30px]"
+            className="rounded-full w-[35px] h-[35px]"
           />
         </Link>
         <Logo className="absolute left-1/2 -translate-x-1/2" width={27} height={27} />

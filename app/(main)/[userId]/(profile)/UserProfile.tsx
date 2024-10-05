@@ -6,15 +6,16 @@ import { Card, Tab, Tabs } from "@nextui-org/react";
 import { format } from "date-fns";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { follow, unFollow } from "@/app/_lib/actions";
 import { ITwitt, SessionUser, User, UserFollowingsAndFollowers } from "@/app/_lib/definitions";
-import { useAppDispatch } from "@/app/_lib/hooks";
+import { useAppDispatch, useRouteChangeTransition } from "@/app/_lib/hooks";
 import { FaLocationDot } from "react-icons/fa6";
 import { setUserData } from "@/app/_lib/slices/userSlice";
 import { GrAttachment } from "react-icons/gr";
 import useSWR from "swr";
+import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 
 type Props = {
   children: React.ReactNode,
@@ -27,6 +28,7 @@ type Props = {
 function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: Props) {
   const [profileDetails, setProfileDetails] = useState({ ...user, follows });
   const [followingText, setFollowingText] = useState('Following');
+  const changeRoute = useRouteChangeTransition();
   const router = useRouter();
   const pathname = usePathname();
   const [currentTab, setCurrentTab] = useState(() => {
@@ -35,6 +37,7 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
     if (pathname === `/${user.username}/media`) return 'media';
   });
   const dispatch = useAppDispatch();
+
   useSWR<User & { follows: UserFollowingsAndFollowers }>(`/api/user/details`, async () => {
     const resp = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/details?id=${user.id}`);
     const data = await resp.json();
@@ -86,7 +89,9 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
       </header>
       <div>
         {profileDetails.header_photo ? (
-          <Card radius="none" isPressable onClick={() => router.push(`/${profileDetails.username}/header_photo`)} className="w-full h-[200px]">
+          <Card radius="none" isPressable onClick={() => {
+            changeRoute(`/${profileDetails.username}/header_photo`);
+          }} className="w-full h-[200px]">
             <img src={profileDetails.header_photo!} className="w-full h-full object-cover" alt={profileDetails.name} />
           </Card>
         ) : (
@@ -94,7 +99,9 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
         )}
         <div className="px-4 flex justify-between mb-3">
           <div className="flex flex-col -mt-[12%] gap-3">
-            <Card isPressable className="h-[140px] w-[140px] min-w-max rounded-full border-4 border-background" onClick={() => router.push(`/${profileDetails.username}/photo`)}>
+            <Card isPressable className="h-[140px] w-[140px] min-w-max rounded-full border-4 border-background" onClick={() => {
+              changeRoute(`/${profileDetails.username}/photo`);
+            }}>
               <img src={profileDetails.profile} className="object-cover h-[140px] w-[140px]" alt={profileDetails.name} />
             </Card>
             <div>
@@ -132,12 +139,12 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
           </div>
           <div className="mt-3">
             {profileDetails.id == sessionUser?.id! as number ? (
-              <Button variant="bordered" className="font-bold text-base" radius="full" onClick={() => router.push(`/${profileDetails.username}/settings/profile`)}>
+              <Button variant="bordered" className="font-bold text-base" radius="full" onClick={() => changeRoute(`/${profileDetails.username}/settings/profile`)}>
                 Edit Profile
               </Button>
             ) : (
               <>
-                {profileDetails.follows.followers.some(follower => follower == sessionUser?.id! as number) ? (
+                {profileDetails.follows.followers.some(follower => follower == sessionUser?.id as number) ? (
                   <Button variant="bordered" className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger" radius="full" onPointerEnter={() => setFollowingText("Unfollow")} onPointerLeave={() => setFollowingText("Following")} onClick={hanldeUnfollow}>
                     {followingText}
                   </Button>

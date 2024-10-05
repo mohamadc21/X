@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { ModalProps } from "./definitions";
 import { AppDispatch, AppStore, RootState } from "./store";
+import { useRouter } from "next/navigation";
+import { setIsChangingRoute } from "./slices/appSlice";
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();
@@ -32,7 +34,6 @@ export const useIsVisible = (ref: React.RefObject<HTMLElement>) => {
   return isVisible;
 }
 
-
 export const useModalProps = (props?: ModalProps): ModalProps => {
   const [inMobile, setInMobile] = useState(false);
 
@@ -58,7 +59,7 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
     isDismissable: props?.isDismissable || false,
     classNames: {
       wrapper: props?.classNames?.wrapper || (props?.ignureMobileSize ? '' : 'items-stretch'),
-      backdrop: `${props?.classNames?.backdrop} ${props?.defaultBackdrop || 'bg-gray-700/70'}`,
+      backdrop: `${props?.classNames?.backdrop} ${props?.defaultBackdrop || 'bg-gray-700/60'}`,
       header: `${props?.classNames?.header || ''} z-[3] bg-background`,
       body: `${props?.classNames?.body} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'} pb-4 pt-8 overflow-y-auto`,
       footer: `${props?.classNames?.footer} ${props?.centerContent ? 'px-[80px]' : 'px-[20px]'}`,
@@ -70,4 +71,26 @@ export const useModalProps = (props?: ModalProps): ModalProps => {
     shouldBlockScroll: props?.shouldBlockScroll || true,
     placement: props?.placement || 'center'
   }
-} 
+}
+
+export const useRouteChangeTransition = () => {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  function changeRoute(route: string) {
+    startTransition(() => {
+      router.push(route);
+    })
+  }
+
+  useEffect(() => {
+    if (isPending) {
+      dispatch(setIsChangingRoute(true));
+    } else {
+      dispatch(setIsChangingRoute(false));
+    }
+  }, [isPending, startTransition, router]);
+
+  return changeRoute;
+}

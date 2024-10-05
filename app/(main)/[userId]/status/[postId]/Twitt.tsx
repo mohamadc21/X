@@ -101,11 +101,8 @@ function Twitt({
     setMessage("");
     if (key === "delete") {
       setShowDeleteConfirm(true);
-    } else if (key === "follow") {
-      await follow(sessionUser.id, twitt.user_id);
-      setMessage(`You're now following @${twitt.username}`);
     } else {
-      setMessage("This option is not available for now.");
+      setMessage("This action is not available for now.");
     }
   }
 
