@@ -1,14 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ITwitt } from "../definitions";
+import { INotification, ITwitt } from "@/app/_lib/definitions";
 
 interface AppState {
   twitts: ITwitt[] | [],
-  isChangingRoute: boolean
+  isChangingRoute: boolean,
+  notifications: INotification[]
 }
 
 const initialState: AppState = {
   twitts: [],
-  isChangingRoute: false
+  isChangingRoute: false,
+  notifications: [],
 }
 
 const appSlice = createSlice({
@@ -20,10 +22,13 @@ const appSlice = createSlice({
     },
     setIsChangingRoute(state, action: PayloadAction<boolean>) {
       state.isChangingRoute = action.payload;
+    },
+    setNotifications(state, action: PayloadAction<INotification[]>) {
+      state.notifications = action.payload;
     }
   }
 })
 
-export const { setTwitts, setIsChangingRoute } = appSlice.actions;
+export const { setTwitts, setIsChangingRoute, setNotifications } = appSlice.actions;
 
 export default appSlice.reducer;

@@ -54,7 +54,6 @@ function TwittsList({
     },
     {
       fallbackData: allTwitts,
-      refreshInterval: 5000,
     }
   );
 

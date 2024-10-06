@@ -6,13 +6,15 @@ import { ResultSetHeader } from "mysql2";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { storage } from "./appwrite";
-import { signIn, signOut } from "./auth";
+import { auth, signIn, signOut } from "./auth";
 import { query } from "./db";
 import {
   ActionError,
   AddTwitt,
+  INotification,
   ITwitt,
   PasswordData,
+  SessionUser,
   SignupData,
   User,
   UserFollowingsAndFollowers,
@@ -59,10 +61,9 @@ export async function logOut() {
   await signOut();
 }
 
-export async function
-  getTwittById(
-    id: number | string
-  ): Promise<ITwitt | null> {
+export async function getTwittById(
+  id: number | string
+): Promise<ITwitt | null> {
   const [twitt] = await query<ITwitt[]>(
     "select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.id = ? order by twitts.id desc",
     [id]
@@ -597,15 +598,21 @@ export async function addTwitt({
   }
 
   try {
-    const result = await query<ResultSetHeader>(
-      `insert into twitts (${fields}) values (${values})`,
-      params
-    );
+    const [result, replyedtoTwitt] = await Promise.all([
+      query<ResultSetHeader>(
+        `insert into twitts (${fields}) values (${values})`,
+        params
+      ),
+      query<{ user_id: number }[]>("select user_id from twitts where id = ?", [replyTo])
+    ])
     if (replyTo) {
-      query(
-        "update twitts set comments = json_array_append(comments, '$', ?) where id = ?",
-        [result.insertId.toString(), replyTo]
-      );
+      await Promise.all([
+        query(
+          "update twitts set comments = json_array_append(comments, '$', ?) where id = ?",
+          [result.insertId.toString(), replyTo]
+        ),
+        pushNotification({ user_id: replyedtoTwitt[0].user_id as number, opposite_id: userId as number, type: "reply", place_id: result.insertId, text })
+      ]);
     }
     return { insertId: result.insertId, error: undefined };
   } catch (err) {
@@ -641,29 +648,28 @@ export async function increaseTwittView(
 }
 
 export async function likeTwitt({
-  twitt_id,
+  twitt,
   user_id,
 }: {
-  twitt_id: number | string;
+  twitt: ITwitt;
   user_id: number | string;
 }) {
   const result = await query<{ likes: number[] }[]>(
     "select likes from twitts where id = ? and json_contains(likes, ?)",
-    [twitt_id, `"${user_id}"`]
+    [twitt.id, `"${user_id}"`]
   );
 
   if (!result.length) {
     await Promise.all([
-      query(
+      await query(
         "update twitts set likes = json_array_append(likes, '$', ?) where id = ?",
-        [`${user_id}`, twitt_id]
+        [`${user_id}`, twitt.id]
       ),
+      pushNotification({ user_id: twitt.user_id as number, opposite_id: user_id as number, type: "like", place_id: twitt.id })
     ]);
   } else {
-    const likes = result[0].likes.filter((like) => like != user_id).toString();
-    await Promise.all([
-      query("update twitts set likes = ? where id = ?", [`[${likes}]`, twitt_id]),
-    ]);
+    const likes = twitt.likes.filter(like => like != user_id).toString();
+    await query("update twitts set likes = ? where id = ?", [`[${likes}]`, twitt.id]);
   }
 }
 
@@ -677,10 +683,15 @@ export async function follow(
   );
   if (exists.length > 0) return;
 
-  await query("insert into follows (follower_id, following_id) values (?,?)", [
-    follower_id,
-    following_id,
+
+  await Promise.all([
+    query("insert into follows (follower_id, following_id) values (?,?)", [
+      follower_id,
+      following_id,
+    ]),
+    pushNotification({ user_id: following_id as number, opposite_id: follower_id as number, type: "follow" })
   ]);
+
 }
 
 export async function unFollow(
@@ -739,4 +750,34 @@ export async function getUserTwittsByMedia(user_id: number | string) {
     [user_id, user_id]
   );
   return twitts;
+}
+
+export async function getUserNotifications(user_id: number | string) {
+  const notifications = await query<INotification[]>("select notifications.user_id, notifications.opposite_id, notifications.type, notifications.place_id, notifications.text, notifications.notified, notifications.is_viewed, users.profile, users.name, users.username from notifications join users on notifications.opposite_id = users.id where user_id = ? order by notifications.id desc", [user_id]);
+  return notifications;
+}
+
+export async function readNotifications({
+  user,
+  onlyNotified
+}: { user?: SessionUser, onlyNotified?: boolean }) {
+  let userSession = user;
+  if (!user) {
+    const session = await auth();
+    if (!session) return;
+    userSession = session.user;
+  }
+  if (!userSession) return;
+  await query(`update notifications set ${onlyNotified ? 'notified=1' : 'is_viewed=1, notified=1'} where user_id = ?`, [userSession.id]);
+}
+
+export async function pushNotification({ user_id, opposite_id, type, place_id, text }: {
+  user_id: number,
+  opposite_id: number,
+  type?: "follow" | "like" | "reply",
+  place_id?: number,
+  text?: string,
+}) {
+
+  await query("insert into notifications(user_id, opposite_id, type, place_id, text) values(?,?,?,?,?)", [user_id, opposite_id || null, type || null, place_id || null, text || null]);
 }

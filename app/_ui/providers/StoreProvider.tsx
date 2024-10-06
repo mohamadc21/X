@@ -1,11 +1,14 @@
 "use client";
 
 import { AppStore, store } from "@/app/_lib/store";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Provider } from "react-redux";
-import { useAppSelector } from "@/app/_lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/_lib/hooks";
 import LoadingSpinner from "../LoadingSpinner";
 import { Modal } from "@nextui-org/modal";
+import useSWR from "swr";
+import { setNotifications } from "@/app/_lib/slices/appSlice";
+import { readNotifications } from "@/app/_lib/actions";
 
 function StoreProvider({ children }: { children: React.ReactNode }) {
   const storeRef = useRef<AppStore>();
@@ -23,7 +26,46 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
 };
 
 function AppProvider({ children }: { children: React.ReactNode }) {
-  const isChangingRoute = useAppSelector(state => state.app.isChangingRoute);
+  const { isChangingRoute, notifications } = useAppSelector(state => state.app);
+  const dispatch = useAppDispatch();
+  useSWR('/api/user/notifications', async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/user/notifications`);
+    const data = await res.json();
+    if (data) {
+      dispatch(setNotifications(data));
+    }
+  }, {
+    refreshInterval: 10000
+  });
+
+  async function showNotifs() {
+    if (notifications.length < 1) return;
+    if (Notification.permission === 'granted') {
+      notifications.forEach(async notif => {
+        let title = '';
+        if (notif.type === 'like') {
+          title = `${notif.name} liked your post`
+        }
+        if (notif.type === 'follow') {
+          title = `${notif.name} started to following you`
+        }
+        if (notif.type === 'reply') {
+          title = `${notif.name} replyed to your post`
+        }
+        if (notif.notified === 0) {
+          new Notification(title, {
+            icon: notif.profile,
+          });
+          await readNotifications({ onlyNotified: true });
+        }
+      })
+    }
+  }
+
+  useEffect(() => {
+    showNotifs();
+  }, [notifications]);
+
   return (
     <>
       {isChangingRoute && (

@@ -1,21 +1,20 @@
 "use client";
 
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { follow, unFollow } from "@/app/_lib/actions";
+import { ITwitt, SessionUser, User, UserFollowingsAndFollowers } from "@/app/_lib/definitions";
+import { useAppDispatch, useRouteChangeTransition } from "@/app/_lib/hooks";
+import { setUserData } from "@/app/_lib/slices/userSlice";
+import PageHeader from "@/app/_ui/PageHeader";
 import { Button } from "@nextui-org/button";
 import { Card, Tab, Tabs } from "@nextui-org/react";
 import { format } from "date-fns";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState } from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
-import { follow, unFollow } from "@/app/_lib/actions";
-import { ITwitt, SessionUser, User, UserFollowingsAndFollowers } from "@/app/_lib/definitions";
-import { useAppDispatch, useRouteChangeTransition } from "@/app/_lib/hooks";
 import { FaLocationDot } from "react-icons/fa6";
-import { setUserData } from "@/app/_lib/slices/userSlice";
 import { GrAttachment } from "react-icons/gr";
 import useSWR from "swr";
-import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 
 type Props = {
   children: React.ReactNode,
@@ -29,7 +28,6 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
   const [profileDetails, setProfileDetails] = useState({ ...user, follows });
   const [followingText, setFollowingText] = useState('Following');
   const changeRoute = useRouteChangeTransition();
-  const router = useRouter();
   const pathname = usePathname();
   const [currentTab, setCurrentTab] = useState(() => {
     if (pathname === `/${user.username}`) return 'posts';
@@ -80,15 +78,7 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
 
   return (
     <div className="flex-1 lg:max-w-full max-w-[600px]">
-      <header className="sticky top-0 left-0 w-full bg-background/40 backdrop-blur-lg flex items-center gap-4 px-2 py-3 z-[3]">
-        <Button variant="light" className="text-lg" radius="full" isIconOnly onClick={() => router.back()}>
-          <ArrowLeftOutlined />
-        </Button>
-        <div>
-          <h2 className="text-xl leading-5 font-bold">{profileDetails.name}</h2>
-          <p className="text-default-400 text-sm">{headerSubtitle}</p>
-        </div>
-      </header>
+      <PageHeader title={profileDetails.name} desc={headerSubtitle} />
       <div>
         {profileDetails.header_photo ? (
           <Card radius="none" isPressable onClick={() => {

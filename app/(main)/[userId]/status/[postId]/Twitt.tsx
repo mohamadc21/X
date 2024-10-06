@@ -67,6 +67,7 @@ function Twitt({
   );
 
   async function handleIncreaseView() {
+    if (twitt.views.some(view => view == sessionUser.id)) return;
     setTwitt((prev) => ({
       ...prev,
       views: [...prev.views, sessionUser.id],
@@ -85,7 +86,7 @@ function Twitt({
           ? [...prev.likes, sessionUser.id]
           : prev.likes.filter((like) => like != sessionUser.id),
     }));
-    await likeTwitt({ twitt_id: twitt.id, user_id: sessionUser.id! });
+    await likeTwitt({ twitt, user_id: sessionUser.id! });
   }
 
   async function hanldeFollow() {

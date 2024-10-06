@@ -15,10 +15,12 @@ import { Badge, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@n
 import { SessionUser } from "../_lib/definitions";
 import { logOut } from "../_lib/actions";
 import Alert from "./Alert";
+import { useAppSelector } from "../_lib/hooks";
 
 function Navigation({ user }: { user: SessionUser }) {
   const [message, setMessage] = useState('');
   const pathname = usePathname();
+  const notifs = useAppSelector(state => state.app.notifications);
 
   const links = [
     {
@@ -47,7 +49,7 @@ function Navigation({ user }: { user: SessionUser }) {
 
         filled: <IoNotifications size={30} />,
       },
-      disabled: true
+      disabled: false
     },
     {
       href: '/messages',
@@ -111,12 +113,28 @@ function Navigation({ user }: { user: SessionUser }) {
             ) : (
               <>
                 <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" className="xl:flex hidden w-full hover:no-underline px-3 min-w-max items-center justify-start gap-4 text-xl" radius="full" onClick={() => link.disabled ? setMessage("This page is not available for now.") : {}}>
-                  {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
+                  {(link.href === '/notifications' && notifs.length > 0) ? (
+                    <Badge content="" size="sm" color="primary">
+                      {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
+                    </Badge>
+                  ) : (
+                    <>
+                      {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
+                    </>
+                  )}
                   <span className={`xl:block hidden ${pathname === link.href ? 'font-bold' : ''}`}>{link?.text}</span>
                 </Button>
 
                 <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" isIconOnly className="xl:hidden flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" radius="full" onClick={() => link.disabled ? setMessage("This page is not available for now.") : {}}>
-                  {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
+                  {(link.href === '/notifications' && notifs.length > 0) ? (
+                    <Badge content="" size="sm" color="primary">
+                      {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
+                    </Badge>
+                  ) : (
+                    <>
+                      {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
+                    </>
+                  )}
                 </Button>
               </>
             )}

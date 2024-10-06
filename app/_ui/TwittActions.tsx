@@ -43,7 +43,7 @@ function TwittActions({ twitt, user, onCommentsClick, onRetwitt, onLike, classNa
       </Button>
       <Button type="submit" variant="bordered" className="flex items-center text-default-400 hover:bg-transparent hover:text-pink-600 border-none group gap-0 transition-all duration-150 min-w-0 px-0" onClick={onLike}>
         <div className="rounded-full py-1.5 px-2 group-hover:bg-pink-600/20">
-          {twitt.likes.includes(user.id.toString()) ? (
+          {twitt.likes.some(like => like == user.id) ? (
             <FaHeart className="text-rose-500" size={15.5} />
           ) : (
             <FaRegHeart size={15.5} />

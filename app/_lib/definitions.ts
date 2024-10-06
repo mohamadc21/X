@@ -89,6 +89,23 @@ export interface Verification {
   expires_at: Date
 }
 
+export interface NotificationsTable {
+  id: number,
+  user_id: number,
+  opposite_id: number,
+  type: "follow" | "like" | "reply" | null,
+  place_id: number | null,
+  text: string | null,
+  is_viewed: 0 | 1
+}
+export interface INotification extends NotificationsTable {
+  profile: string,
+  name: string,
+  username: string,
+  twitt?: ITwitt | null,
+  notified?: 0 | 1
+}
+
 export interface ModalProps {
   className?: string,
   defaultOpen?: boolean,

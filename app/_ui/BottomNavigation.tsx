@@ -78,13 +78,13 @@ function BottomNavigation({ user }: { user: SessionUser }) {
         {links.map((link, idx) => (
           <li key={idx}>
             {idx === 0 ? (
-              <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" isIconOnly className="flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" onClick={() => setMessage("This page is not available for now.")} radius="full">
+              <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" isIconOnly className="flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" onClick={() => link.disabled ? setMessage("This page is not available for now.") : {}} radius="full">
                 <Badge content="" size="sm" color="primary">
                   {pathname === link.href ? link.logo.filled : link.logo.outline}
                 </Badge>
               </Button>
             ) : (
-              <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" isIconOnly className="flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" onClick={() => setMessage("This page is not available for now.")} radius="full">
+              <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" isIconOnly className="flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" onClick={() => link.disabled ? setMessage("This page is not available for now.") : {}} radius="full">
                 {pathname === link.href ? link.logo.filled : link.logo.outline}
               </Button>
             )}
