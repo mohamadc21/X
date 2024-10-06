@@ -2,6 +2,7 @@
 
 import { ID } from "appwrite";
 import bcrypt from "bcryptjs";
+import { ResultSetHeader } from "mysql2";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { storage } from "./appwrite";
@@ -19,8 +20,6 @@ import {
   Verification,
 } from "./definitions";
 import { sendMail } from "./sendMail";
-import { ResultSetHeader } from "mysql2";
-import { redirect, RedirectType } from "next/navigation";
 
 interface CredentialsData extends SignupData, PasswordData { }
 
@@ -60,9 +59,10 @@ export async function logOut() {
   await signOut();
 }
 
-export async function getTwittById(
-  id: number | string
-): Promise<ITwitt | null> {
+export async function
+  getTwittById(
+    id: number | string
+  ): Promise<ITwitt | null> {
   const [twitt] = await query<ITwitt[]>(
     "select twitts.id, twitts.text, twitts.media, twitts.created_at, twitts.media_type, twitts.likes, twitts.views, twitts.reply_to, twitts.comments, twitts.retwitts, users.id as user_id, users.username, users.name, users.profile as user_profile from twitts join users on twitts.user_id = users.id where twitts.id = ? order by twitts.id desc",
     [id]
@@ -172,6 +172,7 @@ export async function deleteTwitt(twitt_id: number | string) {
       twitt[0].comments.length ? deleteComments() : null,
     ]);
   }
+  revalidatePath('/home');
 }
 
 export async function signinWithGoogle() {
@@ -561,7 +562,7 @@ export async function addTwitt({
 }: AddTwitt): Promise<{ insertId?: number; error: ActionError }> {
   let fields = "user_id, text, comments, likes, retwitts, views";
   let values = "?,?,?,?,?,?";
-  let params = [userId, text, "[]", "[]", "[]", `[${userId}]`];
+  let params = [userId, text, "[]", "[]", "[]", `["${userId}"]`];
 
   if (formData?.get("media")) {
     try {
@@ -628,17 +629,15 @@ export async function increaseTwittView(
 
   const alreadyViewed = views.some(
     (view) =>
-      view === (typeof user_id === "string" ? parseInt(user_id) : user_id)
+      view == user_id
   );
 
   if (alreadyViewed) return;
 
-  await Promise.all([
-    query(
-      "update twitts set views = json_array_append(views, '$', ?) where id = ?",
-      [user_id, <string>twitt_id]
-    ),
-  ]);
+  await query(
+    "update twitts set views = json_array_append(views, '$', ?) where id = ?",
+    [`${user_id}`, twitt_id]
+  );
 }
 
 export async function likeTwitt({
@@ -657,13 +656,13 @@ export async function likeTwitt({
     await Promise.all([
       query(
         "update twitts set likes = json_array_append(likes, '$', ?) where id = ?",
-        [user_id, twitt_id]
+        [`${user_id}`, twitt_id]
       ),
     ]);
   } else {
-    const likes = result[0].likes.filter((like) => like != user_id);
+    const likes = result[0].likes.filter((like) => like != user_id).toString();
     await Promise.all([
-      query("update twitts set likes = ? where id = ?", [likes, twitt_id]),
+      query("update twitts set likes = ? where id = ?", [`[${likes}]`, twitt_id]),
     ]);
   }
 }

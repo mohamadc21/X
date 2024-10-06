@@ -48,7 +48,9 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
   });
 
   async function hanldeFollow() {
-    setProfileDetails(prev => ({ ...prev, follows: { ...follows, followers: [...prev.follows.followers, sessionUser?.id! as unknown as number] } }));
+    setTimeout(() => {
+      setProfileDetails(prev => ({ ...prev, follows: { ...follows, followers: [...prev.follows.followers, sessionUser?.id! as unknown as number] } }));
+    }, 600);
     await follow(sessionUser?.id!, user.id);
   }
 
@@ -133,7 +135,7 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
               <p className="text-default-400"><span className="text-foreground">{profileDetails.follows.followings.length}</span> Following</p>
               <p className="text-default-400"><span className="text-foreground">{profileDetails.follows.followers.length}</span> Followers</p>
             </div>
-            {sessionUser?.id != profileDetails.id && (
+            {!sessionUser?.follows.followings.includes(parseInt(profileDetails.id.toString())) && (
               <p className="text-sm text-default-400">Not followed by anyone you&apos;re following</p>
             )}
           </div>
@@ -144,7 +146,7 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
               </Button>
             ) : (
               <>
-                {profileDetails.follows.followers.some(follower => follower == sessionUser?.id as number) ? (
+                {profileDetails.follows.followers.some(follower => follower == sessionUser?.id) ? (
                   <Button variant="bordered" className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger" radius="full" onPointerEnter={() => setFollowingText("Unfollow")} onPointerLeave={() => setFollowingText("Following")} onClick={hanldeUnfollow}>
                     {followingText}
                   </Button>

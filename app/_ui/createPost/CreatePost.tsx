@@ -324,9 +324,8 @@ function CreatePost({
                     variant="bordered"
                     size="lg"
                     dir={isPersianKeyboard ? "rtl" : "ltr"}
-                    placeholder={`${
-                      replyTo ? "Post your reply" : "What's happening?!"
-                    }`}
+                    placeholder={`${replyTo ? "Post your reply" : "What's happening?!"
+                      }`}
                     classNames={{
                       input:
                         "text-xl max-[380px]:text-lg placeholder:text-default-400",
@@ -340,6 +339,7 @@ function CreatePost({
                     }}
                     minRows={rows}
                     maxRows={12}
+                    autoFocus
                   />
                 </div>
                 {media.temp && (
@@ -565,9 +565,8 @@ function CreatePost({
               )}
               {(!showOnClick || (showOnClick && showFull)) && (
                 <div
-                  className={`flex items-center justify-between sticky bottom-0 left-0 w-full gap-3 bg-background mt-3 ${
-                    showOnClick && showFull ? "mt-3" : ""
-                  }`}
+                  className={`flex items-center justify-between sticky bottom-0 left-0 w-full gap-3 bg-background mt-3 ${showOnClick && showFull ? "mt-3" : ""
+                    }`}
                 >
                   <div className="flex max-[400px]:-ml-12 items-center gap-0.5">
                     {options.map((opt, idx) => (

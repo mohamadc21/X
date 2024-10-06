@@ -96,13 +96,13 @@ function Navigation({ user }: { user: SessionUser }) {
           <li key={idx}>
             {idx === 0 ? (
               <>
-                <Button as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} variant="light" size="lg" className="xl:flex hidden w-full hover:no-underline px-3 min-w-max items-center justify-start gap-4 text-xl" radius="full" onClick={() => setMessage("This page is not available for now.")}>
+                <Button as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} variant="light" size="lg" className="xl:flex hidden w-full hover:no-underline px-3 min-w-max items-center justify-start gap-4 text-xl" radius="full" onClick={() => link.disabled ? setMessage("This page is not available for now.") : {}}>
                   <Badge content="" size="sm" color="primary">
                     {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
                   </Badge>
                   <span className={`xl:block hidden ${pathname === link.href ? 'font-bold' : ''}`}>{link?.text}</span>
                 </Button>
-                <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" isIconOnly className="xl:hidden flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" radius="full" onClick={() => setMessage("This page is not available for now.")}>
+                <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" isIconOnly className="xl:hidden flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" radius="full" onClick={() => link.disabled ? setMessage("This page is not available for now.") : {}}>
                   <Badge content="" size="sm" color="primary">
                     {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
                   </Badge>
@@ -110,12 +110,12 @@ function Navigation({ user }: { user: SessionUser }) {
               </>
             ) : (
               <>
-                <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" className="xl:flex hidden w-full hover:no-underline px-3 min-w-max items-center justify-start gap-4 text-xl" radius="full" onClick={() => setMessage("This page is not available for now.")}>
+                <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" className="xl:flex hidden w-full hover:no-underline px-3 min-w-max items-center justify-start gap-4 text-xl" radius="full" onClick={() => link.disabled ? setMessage("This page is not available for now.") : {}}>
                   {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
                   <span className={`xl:block hidden ${pathname === link.href ? 'font-bold' : ''}`}>{link?.text}</span>
                 </Button>
 
-                <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" isIconOnly className="xl:hidden flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" radius="full" onClick={() => setMessage("This page is not available for now.")}>
+                <Button variant="light" as={link.disabled ? "button" : (link?.href ? Link : "button")} href={link?.href || undefined} size="lg" isIconOnly className="xl:hidden flex hover:no-underline  min-w-max items-center justify-center gap-4 text-xl" radius="full" onClick={() => link.disabled ? setMessage("This page is not available for now.") : {}}>
                   {pathname ? (pathname === link.href ? link.logo.filled : link.logo.outline) : null}
                 </Button>
               </>

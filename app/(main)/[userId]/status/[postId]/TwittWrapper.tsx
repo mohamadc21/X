@@ -10,14 +10,15 @@ import LoadingSpinner from "@/app/_ui/LoadingSpinner";
 import TwittCommentsWrapper from "./TwittCommentsWrapper";
 
 async function TwittWrapper({ postId }: { postId: string }) {
-  const [session, twitt, follows] = await Promise.all([
+  const [session, twitt] = await Promise.all([
     auth(),
     getTwittById(postId),
-    getUserFollowersAndFollowings(postId),
   ]);
 
   if (!twitt) notFound();
+  const follows = await getUserFollowersAndFollowings(twitt.user_id);
   const twittWithFollows = { ...twitt, follows };
+  console.log(follows)
 
   return (
     <div className="mt-3">

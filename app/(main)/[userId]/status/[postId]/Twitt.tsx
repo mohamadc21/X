@@ -52,7 +52,6 @@ function Twitt({
   const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
   const router = useRouter();
-  const { mutate } = useSWRConfig();
   useSWR(
     `/api/twitt`,
     async () => {
@@ -123,10 +122,12 @@ function Twitt({
     }
   }, []);
 
+  console.log(twitt);
+
   return (
     <>
       <div className="flex flex-col gap-3 px-4 border-b border-b-default pb-5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <div className="flex items-center justify-between w-full">
             <div className="flex gap-2 items-center">
               <Link href={`/${twitt.username}`} className="w-[45px] h-[45px]">
@@ -150,11 +151,9 @@ function Twitt({
             />
           </div>
           <div>
-            {twitt.user_id !== sessionUser?.id && (
+            {twitt.user_id != sessionUser?.id && (
               <>
-                {twitt.follows.followers.some(
-                  (follower) => follower == (sessionUser?.id! as number)
-                ) ? (
+                {twitt.follows.followers.some(follower => follower == sessionUser?.id) ? (
                   <Button
                     variant="bordered"
                     className="font-bold text-base hover:border-danger/75 hover:bg-danger/20 hover:text-danger"
