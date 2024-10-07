@@ -123,8 +123,6 @@ function Twitt({
     }
   }, []);
 
-  console.log(twitt);
-
   return (
     <>
       <div className="flex flex-col gap-3 px-4 border-b border-b-default pb-5">
