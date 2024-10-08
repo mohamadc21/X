@@ -95,7 +95,7 @@ function TwittView({
         </Link>
       ) : (
         <div
-          className="grid gap-2 to-twitt"
+          className="grid gap-4 to-twitt"
           style={{ gridTemplateColumns: "30px 1fr" }}
         >
           <Link href={`/${twitt.username}`} className="w-[30px] h-[30px] flex-shrink-0">
