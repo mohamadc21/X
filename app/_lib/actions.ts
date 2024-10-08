@@ -22,7 +22,6 @@ import {
   Verification,
 } from "./definitions";
 import { sendMail } from "./sendMail";
-import { redirect } from "next/navigation";
 
 interface CredentialsData extends SignupData, PasswordData { }
 
@@ -330,7 +329,6 @@ export async function signinWithCredentials(data: {
       password: data.password,
       redirect: false,
     });
-    redirect('/home');
   } catch (err: any) {
     if (err instanceof AuthError) {
       return { message: err.message };
