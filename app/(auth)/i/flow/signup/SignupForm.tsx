@@ -40,9 +40,13 @@ function SignupForm() {
     //     </div>
     //   </div>
     // </div>
-    <form onSubmit={() => signinWithCredentials({ email_username: "wyattmohammad1371017@gmail.com", password: "123" })}>
+    <form onSubmit={async (e) => {
+      e.preventDefault();
+      await signinWithCredentials({ email_username: "wyattmohammad1371017@gmail.com", password: "123" })
+    }}>
       <input type="text" value="wyattmohammad1371017@gmail.com" />
       <input type="text" value="123" />
+      <button type="submit">Login</button>
     </form>
   )
 }
