@@ -44,7 +44,7 @@ function BottomNavigation({ user }: { user: SessionUser }) {
 
         filled: <IoNotifications size={25} />,
       },
-      disabled: true
+      disabled: false
     },
     {
       href: '/messages',
