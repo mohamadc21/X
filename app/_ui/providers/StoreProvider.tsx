@@ -39,7 +39,7 @@ function AppProvider({ children }: { children: React.ReactNode }) {
   });
 
   async function showNotifs() {
-    if (notifications.length < 1) return;
+    if (notifications.length === 0) return;
     if (Notification.permission === 'granted') {
       notifications.forEach(async notif => {
         let title = '';

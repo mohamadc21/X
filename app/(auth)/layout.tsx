@@ -7,10 +7,9 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <div className="flex items-center justify-center flex-1 px-4">
-      {/* <SignupForm /> */}
+      <SignupForm />
       <Suspense fallback={<LoadingSpinner type="fullscreen" />}>
         {children}
       </Suspense>
