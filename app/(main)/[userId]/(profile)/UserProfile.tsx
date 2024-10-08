@@ -17,14 +17,13 @@ import { GrAttachment } from "react-icons/gr";
 import useSWR from "swr";
 
 type Props = {
-  children: React.ReactNode,
   user: User & { twitts: ITwitt[] },
   headerSubtitle: string,
   follows: UserFollowingsAndFollowers,
   sessionUser?: SessionUser
 };
 
-function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: Props) {
+function UserProfile({ user, headerSubtitle, follows, sessionUser }: Props) {
   const [profileDetails, setProfileDetails] = useState({ ...user, follows });
   const [followingText, setFollowingText] = useState('Following');
   const changeRoute = useRouteChangeTransition();
@@ -58,6 +57,10 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
   }
 
   useEffect(() => {
+    document.documentElement.scrollTop = 0;
+  }, []);
+
+  useEffect(() => {
     setProfileDetails({ ...user, follows });
   }, [user, follows]);
 
@@ -77,7 +80,7 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
   }, [pathname, currentTab]);
 
   return (
-    <div className="flex-1 lg:max-w-full max-w-[600px]">
+    <div>
       <PageHeader title={profileDetails.name} desc={headerSubtitle} />
       <div>
         {profileDetails.header_photo ? (
@@ -165,7 +168,6 @@ function UserProfile({ children, user, headerSubtitle, follows, sessionUser }: P
           <Tab as={Link} className="hover:no-underline" key="replies" href={`/${profileDetails.username}/with_replies`} title="Replies" />
           <Tab as={Link} className="hover:no-underline" key="media" href={`/${profileDetails.username}/media`} title="Media" />
         </Tabs>
-        {children}
       </div>
     </div>
   )

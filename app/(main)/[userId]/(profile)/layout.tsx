@@ -14,10 +14,11 @@ async function Layout({ children, modal, params }: { children: React.ReactNode, 
   const follows = await getUserFollowersAndFollowings(user.id);
 
   return (
-    <UserProfile user={user} headerSubtitle={`${user.twitts.length} post${user.twitts.length! > 0 ? 's' : ''}`} follows={follows} sessionUser={session?.user!}>
+    <div className="flex-1">
+      <UserProfile user={user} headerSubtitle={`${user.twitts.length} post${user.twitts.length! > 0 ? 's' : ''}`} follows={follows} sessionUser={session?.user!} />
       {modal}
       {children}
-    </UserProfile>
+    </div>
   )
 }
 
